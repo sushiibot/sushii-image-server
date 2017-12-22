@@ -12,6 +12,8 @@ GET /url/:url
 $ curl localhost:3000/url/https%3A%2F%2Fgoogle.com
 ```
 
+---
+
 ### Generate a screenshot of given HTML
 ```
 POST /html
