@@ -1,0 +1,17 @@
+{
+  "name": "sbot2-image-server",
+  "version": "1.0.0",
+  "description": "Local webserver and headless browser to generate screenshots.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "koa": "^2.4.1",
+    "koa-router": "^7.3.0",
+    "puppeteer": "^0.13.0"
+  }
+}
