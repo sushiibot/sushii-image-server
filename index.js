@@ -28,8 +28,8 @@ async function main() {
         const page = await browser.newPage();
 
         const html = ctx.request.body.html;
-        const width = ctx.request.body.width;
-        const height = ctx.request.body.height;
+        const width = parseInt(ctx.request.body.width);
+        const height = parseInt(ctx.request.body.height);
 
         await page.setViewport({width: width, height: height});
         await page.setContent(html);
