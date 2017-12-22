@@ -1,6 +1,9 @@
 # sbot2-image-server
 Simple local web server made with [Koa](https://github.com/koajs/koa) and [puppeteer](https://github.com/GoogleChrome/puppeteer) to generate images. 
 
+## ⚠ Warning
+Don't serve this publicly unless you know the risks.  Any JavaScript can be ran on the system and local files can be accessed.
+
 ## API Endpoints
 ### Generate a screenshot of given url.
 ```
