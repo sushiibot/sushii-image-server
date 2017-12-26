@@ -13,7 +13,7 @@ GET /url/:url
 
 #### Example
 ```bash
-$ curl localhost:3000/url/https%3A%2F%2Fgoogle.com
+$ curl localhost:3000/url/https%3A%2F%2Fgoogle.com > image.png
 ```
 
 ---
@@ -36,5 +36,5 @@ POST /html
 $ curl localhost:3000/html \
     -d html=hi \
     -d width=1280 \
-    -d height=720
+    -d height=720 > image.png
 ```
