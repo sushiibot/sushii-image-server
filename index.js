@@ -32,7 +32,7 @@ async function main() {
         const height = parseInt(ctx.request.body.height);
 
         await page.setViewport({width: width, height: height});
-        await page.setContent(html);
+        await page.goto(`data:text/html,${html}`, { waitUntil: 'load' });
 
         ctx.body = await page.screenshot({omitBackground: true});
         ctx.type = 'image/png';
