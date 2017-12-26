@@ -1,5 +1,6 @@
 const Koa = require('koa');
 const bodyParser = require('koa-bodyparser');
+const serve = require('koa-static');
 const Router = require('koa-router');
 const puppeteer = require('puppeteer');
 const devices = require('puppeteer/DeviceDescriptors');
@@ -41,6 +42,7 @@ async function main() {
     });
 
     app
+        .use(serve('./files'))
         .use(bodyParser())
         .use(router.routes())
         .use(router.allowedMethods());
