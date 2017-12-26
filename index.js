@@ -34,7 +34,7 @@ async function main() {
         await page.setViewport({width: width, height: height});
         await page.setContent(html);
 
-        ctx.body = await page.screenshot();
+        ctx.body = await page.screenshot({omitBackground: true});
         ctx.type = 'image/png';
 
         page.close();
