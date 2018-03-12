@@ -47,9 +47,10 @@ async function main() {
         .use(router.routes())
         .use(router.allowedMethods());
 
-
-    app.listen(3000, '127.0.0.1');
-    console.log("Listening on :3000");
+    var port = process.env.PORT || 3000;
+    
+    app.listen(port, '127.0.0.1');
+    console.log("Listening on :" + port);
 }
 
 
