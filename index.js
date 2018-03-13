@@ -1,9 +1,8 @@
-const Koa = require('koa');
+const Koa        = require('koa');
+const serve      = require('koa-static');
+const Router     = require('koa-router');
 const bodyParser = require('koa-bodyparser');
-const serve = require('koa-static');
-const Router = require('koa-router');
-const puppeteer = require('puppeteer');
-const devices = require('puppeteer/DeviceDescriptors');
+const puppeteer  = require('puppeteer');
 
 const port = process.env.PORT || 3000;
 
@@ -13,11 +12,11 @@ const router = new Router();
 async function main() {
     const browser = await puppeteer.launch({args: ['--no-sandbox', '--disable-setuid-sandbox']});
 
-    router.get('/', (ctx, next) => {
-        ctx.body = "hi";
+    router.get('/', (ctx) => {
+        ctx.body = 'hi';
     });
 
-    router.get('/url/:url', async (ctx, next) => {
+    router.get('/url/:url', async (ctx) => {
         const page = await browser.newPage();
 
         await page.goto(ctx.params.url);
@@ -27,7 +26,7 @@ async function main() {
         page.close();
     });
 
-    router.post('/html', async (ctx, next) => {
+    router.post('/html', async (ctx) => {
         const page = await browser.newPage();
 
         const html = ctx.request.body.html;
@@ -50,8 +49,7 @@ async function main() {
         .use(router.allowedMethods());
     
     app.listen(port, '127.0.0.1');
-    console.log("Listening on :" + port);
+    console.log('Listening on :' + port);
 }
-
 
 main();
