@@ -5,6 +5,8 @@ const Router = require('koa-router');
 const puppeteer = require('puppeteer');
 const devices = require('puppeteer/DeviceDescriptors');
 
+const port = process.env.PORT || 3000;
+
 const app = new Koa();
 const router = new Router();
 
@@ -46,8 +48,6 @@ async function main() {
         .use(bodyParser())
         .use(router.routes())
         .use(router.allowedMethods());
-
-    var port = process.env.PORT || 3000;
     
     app.listen(port, '127.0.0.1');
     console.log("Listening on :" + port);
