@@ -16,10 +16,16 @@ async function main() {
         ctx.body = 'hi';
     });
 
-    router.get('/url/:url', async (ctx) => {
+    router.post('/url', async (ctx) => {
         const page = await browser.newPage();
+        const {url, width, height} = ctx.request.body;
 
-        await page.goto(ctx.params.url);
+        const widthInt = parseInt(width);
+        const heightInt = parseInt(height);
+
+        await page.setViewport({width: widthInt, height: heightInt});
+        await page.goto(url);
+
         ctx.body = await page.screenshot();
         ctx.type = 'image/png';
 
@@ -28,12 +34,12 @@ async function main() {
 
     router.post('/html', async (ctx) => {
         const page = await browser.newPage();
+        const {html, width, height} = ctx.request.body;
 
-        const html = ctx.request.body.html;
-        const width = parseInt(ctx.request.body.width);
-        const height = parseInt(ctx.request.body.height);
+        const widthInt = parseInt(width);
+        const heightInt = parseInt(height);
 
-        await page.setViewport({width: width, height: height});
+        await page.setViewport({width: widthInt, height: heightInt});
         await page.goto(`data:text/html,${html}`, { waitUntil: 'load' });
 
         ctx.body = await page.screenshot({omitBackground: true});

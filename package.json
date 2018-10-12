@@ -1,6 +1,6 @@
 {
-  "name": "sbot2-image-server",
-  "version": "1.1.0",
+  "name": "sushii-image-server",
+  "version": "2.0.0",
   "description": "Local webserver and headless browser to generate screenshots.",
   "main": "index.js",
   "scripts": {
