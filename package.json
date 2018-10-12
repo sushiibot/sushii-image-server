@@ -1,13 +1,17 @@
 {
   "name": "sushii-image-server",
-  "version": "2.0.0",
-  "description": "Local webserver and headless browser to generate screenshots.",
+  "version": "2.1.0",
+  "description": "Simple local web server made with Koa and puppeteer to generate images.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js"
   },
-  "author": "",
+  "author": "Derrick Lee <dlee3@scu.edu>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/drklee3/sushii-image-server.git"
+  },
   "license": "ISC",
   "dependencies": {
     "koa": "^2.5.3",
