@@ -11,21 +11,32 @@ Don't serve this publicly unless you know the risks.  Any JavaScript can be ran 
 
 ### Generate a screenshot of given url
 
+```text
+POST /url
 ```
-GET /url/:url
-```
+
+#### Arguments
+
+| Parameter | Description                      |
+| :-------- | :------------------------------- |
+| url       | URL to generate a screenshot of  |
+| width     | Screenshot width                 |
+| height    | Screenshot height                |
 
 #### Example
 
 ```bash
-curl localhost:3000/url/https%3A%2F%2Fgoogle.com > image.png
+curl localhost:3000/url \
+    -d url=https://google.com \
+    -d width=1280 \
+    -d height=720 > image.png
 ```
 
 ---
 
 ### Generate a screenshot of given HTML
 
-```
+```text
 POST /html
 ```
 
