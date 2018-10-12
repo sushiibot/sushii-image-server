@@ -57,6 +57,19 @@ curl localhost:3000/html \
     -d height=720 > image.png
 ```
 
+### Get image server statistics
+
+```text
+GET /
+```
+
+#### Example
+
+```bash
+$ curl localhost:3000
+{"version":"2.1.0","count":2}
+```
+
 ## Installation
 
 1. Install [Node.js and npm](https://nodejs.org/en/download/package-manager/)
