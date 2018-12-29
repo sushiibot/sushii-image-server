@@ -60,7 +60,8 @@ curl localhost:3000/url \
     -d url=https://google.com \
     -d width=1280 \
     -d height=720 \
-    -d imageFormat=jpeg > image.jpg
+    -d imageFormat=jpeg \
+    -d quality=90 > image.jpg
 ```
 
 ---
