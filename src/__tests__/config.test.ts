@@ -4,6 +4,7 @@ import Config from "../config";
 const config = new Config("./src/__tests__/config.test.json");
 // default config, same as config.json in root dir
 const defaultConfig = new Config("./notavalidfile.json");
+const invalidConfig = new Config("./src/__tests__/config.invalid.test.json");
 
 test("config file is read successfully", () => {
     expect(config.config).toBeDefined;
@@ -11,6 +12,13 @@ test("config file is read successfully", () => {
 
 test("Nonexistant config file is undefined", () => {
     expect(defaultConfig.config).toBeUndefined;
+})
+
+test("Invalid config produces errors", () => {
+    const errs = invalidConfig._getConfigErrors();
+    expect(errs.length).toBe(8);
+
+    expect(invalidConfig.isValid()).toBe(false);
 })
 
 test("Is headless", () => {

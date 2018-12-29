@@ -1,0 +1,13 @@
+{
+    "interface": true,
+    "port": "this is",
+
+    "headless": "invalid",
+    "browserArgs": 1234,
+
+    "width": "so don't",
+    "height": "use this",
+
+    "imageFormat": "config",
+    "quality": "obviously"
+}
