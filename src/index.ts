@@ -1,10 +1,11 @@
-const Koa        = require("koa");
-const serve      = require("koa-static");
-const Router     = require("koa-router");
-const bodyParser = require("koa-bodyparser");
-const puppeteer  = require("puppeteer");
-const package    = require("./package.json");
-const Config     = require("./config");
+import * as Koa        from "koa";
+import * as serve      from "koa-static";
+import * as Router     from "koa-router";
+import * as bodyParser from "koa-bodyparser";
+import * as puppeteer  from "puppeteer";
+import * as Types      from "./types";
+import pkg             from "../package.json";
+import Config          from "./config";
 
 const app    = new Koa();
 const router = new Router();
@@ -21,12 +22,13 @@ async function main() {
     let htmlCount = 0;
 
     router.get("/", (ctx) => {
-        ctx.body = {
-            version: package.version,
+        const stats: Types.Stats = {
+            version: pkg.version,
             urlCount,
             htmlCount,
             totalCount: urlCount + htmlCount,
         };
+        ctx.body = stats;
     });
 
     router.post("/url", async (ctx) => {
@@ -40,7 +42,7 @@ async function main() {
         await page.goto(url);
 
         const imageFormat = config.getImageFormat(body);
-        const screenshotOptions = {
+        const screenshotOptions: Types.ScreenshotOptions = {
             omitBackground: true,
             type: imageFormat
         };
@@ -67,7 +69,7 @@ async function main() {
         await page.goto(`data:text/html,${html}`, { waitUntil: "load" });
 
         const imageFormat = config.getImageFormat(body);
-        const screenshotOptions = {
+        const screenshotOptions: Types.ScreenshotOptions = {
             omitBackground: true,
             type: imageFormat
         };
@@ -99,10 +101,10 @@ async function main() {
         .use(bodyParser())
         .use(router.routes())
         .use(router.allowedMethods());
-    
-    const {interface, port} = config.getInterfacePort();
-    app.listen(port, interface);
-    console.log(`Listening on: ${interface}:${port}`);
+
+    const ifacePort = config.getInterfacePort();
+    app.listen(ifacePort.port, ifacePort.interface);
+    console.log(`Listening on: ${ifacePort.interface}:${ifacePort.port}`);
 }
 
 main();

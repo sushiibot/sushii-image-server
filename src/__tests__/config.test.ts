@@ -1,7 +1,7 @@
-const Config = require("../config.js");
+import Config from "../config";
 
 // different values
-const config = new Config("./__tests__/config.test.json");
+const config = new Config("./src/__tests__/config.test.json");
 // default config, same as config.json in root dir
 const defaultConfig = new Config("./notavalidfile.json");
 
