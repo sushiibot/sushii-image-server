@@ -7,5 +7,7 @@
 
     "width": 1280,
     "height": 720,
-    "imageFormat": "jpg"
+
+    "imageFormat": "jpg",
+    "quality": 100
 }

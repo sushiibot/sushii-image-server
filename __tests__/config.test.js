@@ -110,3 +110,22 @@ test("Both dimensions given by default", () => {
     const dimensions = defaultConfig.getDimensions({});
     expect(dimensions).toEqual({ width: 512, height: 512 });
 })
+
+test("Quality given in body", () => {
+    const body = {
+        quality: "50",
+    };
+
+    const quality = config.getQuality(body);
+    expect(quality).toEqual(50);
+})
+
+test("Quality given in config", () => {
+    const quality = config.getQuality({});
+    expect(quality).toEqual(100);
+})
+
+test("Quality given by default", () => {
+    const quality = defaultConfig.getQuality({});
+    expect(quality).toEqual(70);
+})

@@ -39,7 +39,17 @@ async function main() {
         await page.setViewport({width, height});
         await page.goto(url);
 
-        ctx.body = await page.screenshot();
+        const imageFormat = config.getImageFormat(body);
+        const screenshotOptions = {
+            omitBackground: true,
+            type: imageFormat
+        };
+
+        if (imageFormat == "jpeg") {
+            screenshotOptions.quality = config.getQuality(body);
+        }
+
+        ctx.body = await page.screenshot(screenshotOptions);
         ctx.type = config.getResponseType(body);
 
         urlCount++;
@@ -56,7 +66,17 @@ async function main() {
         await page.setViewport({width, height});
         await page.goto(`data:text/html,${html}`, { waitUntil: "load" });
 
-        ctx.body = await page.screenshot({omitBackground: true});
+        const imageFormat = config.getImageFormat(body);
+        const screenshotOptions = {
+            omitBackground: true,
+            type: imageFormat
+        };
+
+        if (imageFormat == "jpeg") {
+            screenshotOptions.quality = config.getQuality(body);
+        }
+
+        ctx.body = await page.screenshot(screenshotOptions);
         ctx.type = config.getResponseType(body);
 
         htmlCount++;
