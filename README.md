@@ -86,8 +86,10 @@ $ curl localhost:3000
     ```bash
     npm install
     ```
-4. Install [chromium dependencies](https://github.com/GoogleChrome/puppeteer/blob/master/docs/troubleshooting.md#chrome-headless-doesnt-launch) (optional).
+4. Install [chromium dependencies](https://github.com/GoogleChrome/puppeteer/blob/master/docs/troubleshooting.md#chrome-headless-doesnt-launch). You can check if you are missing dependencies with `ldd chrome | grep not`.
+
+    Example command to install common dependencies for Debian based systems:
     ```bash
     sudo apt-get install -y gconf-service libasound2 libatk1.0-0 libc6 libcairo2 libcups2 libdbus-1-3 libexpat1 libfontconfig1 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 libglib2.0-0 libgtk-3-0 libnspr4 libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 ca-certificates fonts-liberation libappindicator1 libnss3 lsb-release xdg-utils wget
     ```
-5. Start with `npm start` or with a process manager like [PM2](https://github.com/Unitech/pm2). To start it with a custom port use `PORT=3001 npm start` (port 3001 in this example).
+5. Start with `npm start` or with a process manager like [PM2](https://github.com/Unitech/pm2). A custom port can be passed via the `PORT` environment variable.  Example: `PORT=3001 npm start`
