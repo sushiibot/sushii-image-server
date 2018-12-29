@@ -1,6 +1,6 @@
 {
   "name": "sushii-image-server",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Simple local web server made with Koa and puppeteer to generate images.",
   "main": "index.js",
   "scripts": {

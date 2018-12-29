@@ -30,6 +30,8 @@ An example configuration can be found in [`config.json`](./config.json).  These 
 
     // possible values: "png", "jpg", "jpeg"
     "imageFormat": "jpg"
+    // quality of image between 0-100, only applicable to jpeg images
+    "quality": 70
 }
 ```
 
@@ -41,14 +43,15 @@ An example configuration can be found in [`config.json`](./config.json).  These 
 POST /url
 ```
 
-#### Arguments
+#### Request
 
-| Parameter   | Description                      |
-| :---------- | :------------------------------- |
-| url         | URL to generate a screenshot of  |
-| width       | Screenshot width                 |
-| height      | Screenshot height                |
-| imageFormat | Image format (png or jpeg)       |
+| Parameter   | Description                                |
+| :---------- | :----------------------------------------- |
+| url         | URL to generate a screenshot of (required) |
+| width       | Screenshot width                           |
+| height      | Screenshot height                          |
+| imageFormat | Image format (png or jpeg)                 |
+| quality     | Jpeg image quality (0-100)                 |
 
 #### Example
 
@@ -56,7 +59,8 @@ POST /url
 curl localhost:3000/url \
     -d url=https://google.com \
     -d width=1280 \
-    -d height=720 > image.png
+    -d height=720 \
+    -d imageFormat=jpeg > image.jpg
 ```
 
 ---
@@ -67,14 +71,15 @@ curl localhost:3000/url \
 POST /html
 ```
 
-#### Arguments
+#### Request
 
-| Parameter   | Description                      |
-| :---------- | :------------------------------- |
-| html        | HTML to generate a screenshot of |
-| width       | Screenshot width                 |
-| height      | Screenshot height                |
-| imageFormat | Image format (png or jpeg)       |
+| Parameter   | Description                                 |
+| :---------- | :------------------------------------------ |
+| html        | HTML to generate a screenshot of (required) |
+| width       | Screenshot width                            |
+| height      | Screenshot height                           |
+| imageFormat | Image format (png or jpeg)                  |
+| quality     | Jpeg image quality (0-100)                 |
 
 #### Example
 
@@ -82,7 +87,8 @@ POST /html
 curl localhost:3000/html \
     -d html=hi \
     -d width=1280 \
-    -d height=720 > image.png
+    -d height=720 \
+    -d imageFormat=png > image.png
 ```
 
 ### Get image server statistics

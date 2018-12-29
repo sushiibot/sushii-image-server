@@ -56,7 +56,7 @@ module.exports = class Config {
         };
     }
 
-    _getimageFormat(body) {
+    _getImageFormat(body) {
         let {imageFormat} = body;
         // post body type
         if (imageFormat !== undefined) {
@@ -72,14 +72,19 @@ module.exports = class Config {
         return "png";
     }
 
-    getResponseType(body) {
-        let type = this._getimageFormat(body);
-
+    getImageFormat(body) {
+        let type = this._getImageFormat(body);
         // its jpeg not jpg bruh
         // https://tools.ietf.org/html/rfc3745, https://www.w3.org/Graphics/JPEG/
         if (type === "jpg") {
             type = "jpeg";
         }
+
+        return type;
+    }
+
+    getResponseType(body) {
+        let type = this.getImageFormat(body);
 
         return `image/${type}`;
     }
@@ -103,5 +108,23 @@ module.exports = class Config {
             width: parseInt(this._getDimension(width, "width")),
             height: parseInt(this._getDimension(height, "height")),
         };
+    }
+
+    _getQuality(body) {
+        let {quality} = body;
+        
+        if (quality !== undefined) {
+            return quality;
+        }
+
+        if (this.config && this.config.quality !== undefined) {
+            return this.config.quality;
+        }
+
+        return 70;
+    }
+
+    getQuality(body) {
+        return parseInt(this._getQuality(body));
     }
 };
