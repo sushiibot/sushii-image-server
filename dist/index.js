@@ -53,7 +53,7 @@ async function main() {
         const { html } = body;
         const { width, height } = config.getDimensions(body);
         await page.setViewport({ width, height });
-        await page.goto(`data:text/html,${html}`, { waitUntil: "load" });
+        await page.goto(`data:text/html;charset=utf-8,${html}`, { waitUntil: "load" });
         const imageFormat = config.getImageFormat(body);
         const screenshotOptions = {
             omitBackground: true,
@@ -87,6 +87,9 @@ async function main() {
     const ifacePort = config.getInterfacePort();
     app.listen(ifacePort.port, ifacePort.interface);
     console.log(`Listening on: ${ifacePort.interface}:${ifacePort.port}`);
+}
+if (!config.isValid()) {
+    process.exit();
 }
 main();
 //# sourceMappingURL=index.js.map
