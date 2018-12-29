@@ -107,4 +107,8 @@ async function main() {
     console.log(`Listening on: ${ifacePort.interface}:${ifacePort.port}`);
 }
 
+if (!config.isValid()) {
+    process.exit();
+}
+
 main();

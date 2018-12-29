@@ -8,8 +8,8 @@ interface Config {
     headless?: boolean;
     browserArgs?: string;
 
-    width?: string;
-    height?: string;
+    width?: number;
+    height?: number;
 
     imageFormat?: Types.ImageFormat;
     quality?: number;
@@ -32,6 +32,68 @@ export default class ConfigReader {
                 console.log("Something went wrong reading config file");
             }
         }
+    }
+
+    /**
+     * Gets config fields that are invalid
+     */
+    _getConfigErrors(): string[] {
+        const errors: string[] = [];
+        
+        try {
+            // should return with either config value or default
+            // default value should obviously not error or I'm dumb
+            const _ = this.getImageFormat({})
+        } catch (err) {
+            errors.push("imageFormat (string)");
+        }
+
+        // default values so ignore rest
+        if (this.config === undefined) {
+            return errors;
+        }
+
+        if (this.config.interface && typeof this.config.interface !== "string") {
+            errors.push("interface (string)");
+        }
+
+        if (this.config.port && typeof this.config.port !== "number") {
+            errors.push("port (number)")
+        }
+        
+        if (this.config.headless && typeof this.config.headless !== "boolean") {
+            errors.push("headless (boolean)");
+        }
+
+        if (this.config.browserArgs && typeof this.config.browserArgs !== "string") {
+            errors.push("browserArgs (string)");
+        }
+
+        if (this.config.width && typeof this.config.width !== "number") {
+            errors.push("width (number)");
+        }
+
+        if (this.config.height && typeof this.config.height !== "number") {
+            errors.push("height (number)");
+        }
+
+        if (this.config.quality && typeof this.config.quality !== "number") {
+            errors.push("quality (number)");
+        }
+
+        return errors;
+    }
+
+    isValid(): boolean {
+        const errs = this._getConfigErrors();
+
+        if (errs.length === 0) {
+            return true;
+        }
+
+        const errStr = errs.join("\n\t");
+        console.log(`The following fields in your configuration have incorrect types:\n\t${errStr}`);
+        return false;
     }
 
     /**
@@ -138,7 +200,7 @@ export default class ConfigReader {
         }
 
         if (!this._isValidFormat(type)) {
-            throw new TypeError("Invalid type given");
+            throw new TypeError(`Invalid type given: ${type}`);
         }
 
         return type as Types.ImageFormat;
@@ -170,7 +232,7 @@ export default class ConfigReader {
         }
 
         if (this.config && this.config[dim] !== undefined) {
-            return parseInt(this.config[dim]);
+            return this.config[dim];
         }
 
         return 512;

@@ -28,8 +28,8 @@ An example configuration can be found in [`config.json`](./config.json).  These 
     "width": 1280,
     "height": 720,
 
-    // possible values: "png", "jpg", "jpeg"
-    "imageFormat": "jpg"
+    // possible values: "png", "jpeg"
+    "imageFormat": "png"
     // quality of image between 0-100, only applicable to jpeg images
     "quality": 70
 }
