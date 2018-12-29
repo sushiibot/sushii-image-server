@@ -11,7 +11,7 @@ Don't serve this publicly unless you know the risks.  Any JavaScript can be ran 
 
 ## Configuration
 
-An example configuration can be found in [`config.json`](./config.json).  These values are also given by default if a config file is not found.  POST parameters will be take priority over config values.  For example, if the `width` setting in the config is set to `512` and a POST request to `/url` or `/html` has a paramter of `1028`, it will use `1028` for that specific request.
+An example configuration can be found in [`config.json`](./config.json).  These values are also given by default if a config file is not found or fields are omitted.  POST parameters will be take priority over config values.  For example, if the `width` setting in the config is set to `512` and a POST request to `/url` or `/html` has a paramter of `1028`, it will use `1028` for that specific request.
 
 ```javascript
 {
