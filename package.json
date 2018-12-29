@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc",
     "test": "jest",
-    "start": "npm run build && node dist/index.js"
+    "start": "node dist/index.js"
   },
   "author": "Derrick Lee <dlee3@scu.edu>",
   "repository": {
