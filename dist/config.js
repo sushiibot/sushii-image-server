@@ -19,6 +19,55 @@ class ConfigReader {
         }
     }
     /**
+     * Gets config fields that are invalid
+     */
+    _getConfigErrors() {
+        const errors = [];
+        try {
+            // should return with either config value or default
+            // default value should obviously not error or I'm dumb
+            const _ = this.getImageFormat({});
+        }
+        catch (err) {
+            errors.push("imageFormat (string)");
+        }
+        // default values so ignore rest
+        if (this.config === undefined) {
+            return errors;
+        }
+        if (this.config.interface && typeof this.config.interface !== "string") {
+            errors.push("interface (string)");
+        }
+        if (this.config.port && typeof this.config.port !== "number") {
+            errors.push("port (number)");
+        }
+        if (this.config.headless && typeof this.config.headless !== "boolean") {
+            errors.push("headless (boolean)");
+        }
+        if (this.config.browserArgs && typeof this.config.browserArgs !== "string") {
+            errors.push("browserArgs (string)");
+        }
+        if (this.config.width && typeof this.config.width !== "number") {
+            errors.push("width (number)");
+        }
+        if (this.config.height && typeof this.config.height !== "number") {
+            errors.push("height (number)");
+        }
+        if (this.config.quality && typeof this.config.quality !== "number") {
+            errors.push("quality (number)");
+        }
+        return errors;
+    }
+    isValid() {
+        const errs = this._getConfigErrors();
+        if (errs.length === 0) {
+            return true;
+        }
+        const errStr = errs.join("\n\t");
+        console.log(`The following fields in your configuration have incorrect types:\n\t${errStr}`);
+        return false;
+    }
+    /**
      * Gets the option if the background browser should run headless
      */
     isHeadless() {
@@ -106,7 +155,7 @@ class ConfigReader {
             type = "jpeg";
         }
         if (!this._isValidFormat(type)) {
-            throw new TypeError("Invalid type given");
+            throw new TypeError(`Invalid type given: ${type}`);
         }
         return type;
     }
@@ -118,7 +167,8 @@ class ConfigReader {
      */
     getResponseType(body) {
         const type = this.getImageFormat(body);
-        return type;
+        const responseType = `image/${type}`;
+        return responseType;
     }
     /**
      * Gets a single image and view port dimension
@@ -132,7 +182,7 @@ class ConfigReader {
             return parseInt(value);
         }
         if (this.config && this.config[dim] !== undefined) {
-            return parseInt(this.config[dim]);
+            return this.config[dim];
         }
         return 512;
     }

@@ -66,7 +66,7 @@ async function main() {
         const {width, height} = config.getDimensions(body);
 
         await page.setViewport({width, height});
-        await page.goto(`data:text/html,${html}`, { waitUntil: "load" });
+        await page.goto(`data:text/html;charset=utf-8,${html}`, { waitUntil: "load" });
 
         const imageFormat = config.getImageFormat(body);
         const screenshotOptions: Types.ScreenshotOptions = {
