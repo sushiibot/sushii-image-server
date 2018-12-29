@@ -1,11 +1,12 @@
 {
   "name": "sushii-image-server",
-  "version": "3.0.1",
+  "version": "3.1.0",
   "description": "Simple local web server made with Koa and puppeteer to generate images.",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
+    "build": "tsc",
     "test": "jest",
-    "start": "node index.js"
+    "start": "npm run build && node dist/index.js"
   },
   "author": "Derrick Lee <dlee3@scu.edu>",
   "repository": {
@@ -21,7 +22,15 @@
     "puppeteer": "^1.9.0"
   },
   "devDependencies": {
+    "@types/jest": "^23.3.10",
+    "@types/koa": "^2.0.47",
+    "@types/koa-bodyparser": "^4.2.1",
+    "@types/koa-router": "^7.0.35",
+    "@types/koa-static": "^4.0.0",
+    "@types/puppeteer": "^1.11.1",
     "eslint-plugin-jest": "^22.1.2",
-    "jest": "^23.6.0"
+    "jest": "^23.6.0",
+    "ts-jest": "^23.10.5",
+    "typescript": "^3.2.2"
   }
 }
