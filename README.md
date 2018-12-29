@@ -1,5 +1,7 @@
 # sushii-image-server
 
+[![Build Status](https://travis-ci.org/drklee3/sushii-image-server.svg?branch=master)](https://travis-ci.org/drklee3/sushii-image-server)
+
 Simple local web server made with [Koa](https://github.com/koajs/koa) and [puppeteer](https://github.com/GoogleChrome/puppeteer) to generate images for [sushii-bot](https://github.com/drklee3/sushii-bot).
 The files directory can be used to serve static files used for HTML screenshots (e.g., JavaScript files).
 
