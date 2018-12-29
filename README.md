@@ -93,7 +93,7 @@ GET /
 
 ```bash
 $ curl localhost:3000
-{"version":"2.1.0","urlCount":3,"htmlCount":3,"totalCount":6}
+{"version":"3.0.0","urlCount":3,"htmlCount":3,"totalCount":6}
 ```
 
 ## Installation
