@@ -1,0 +1,11 @@
+{
+    "interface": "127.0.0.1",
+    "port": 3000,
+
+    "headless": true,
+    "browserArgs": "",
+
+    "width": 512,
+    "height": 512,
+    "imageFormat": "png"
+}

@@ -1,20 +1,26 @@
-const Koa        = require('koa');
-const serve      = require('koa-static');
-const Router     = require('koa-router');
-const bodyParser = require('koa-bodyparser');
-const puppeteer  = require('puppeteer');
-const package    = require('./package.json');
+const Koa        = require("koa");
+const serve      = require("koa-static");
+const Router     = require("koa-router");
+const bodyParser = require("koa-bodyparser");
+const puppeteer  = require("puppeteer");
+const package    = require("./package.json");
+const Config     = require("./config");
 
-const port   = process.env.PORT || 3000;
 const app    = new Koa();
 const router = new Router();
+const config = new Config();
 
 async function main() {
-    const browser = await puppeteer.launch({args: ['--no-sandbox', '--disable-setuid-sandbox']});
-    let urlCount = 0;
+    const browserArgs = config.getBrowserArgs();
+    const browser     = await puppeteer.launch({
+        headless: config.isHeadless(),
+        args: browserArgs
+    });
+
+    let urlCount  = 0;
     let htmlCount = 0;
 
-    router.get('/', (ctx) => {
+    router.get("/", (ctx) => {
         ctx.body = {
             version: package.version,
             urlCount,
@@ -23,35 +29,35 @@ async function main() {
         };
     });
 
-    router.post('/url', async (ctx) => {
-        const page = await browser.newPage();
-        const {url, width, height} = ctx.request.body;
+    router.post("/url", async (ctx) => {
+        const page  = await browser.newPage();
+        const body  = ctx.request.body;
+        const {url} = body;
 
-        const widthInt = parseInt(width);
-        const heightInt = parseInt(height);
+        const {width, height} = config.getDimensions(body);
 
-        await page.setViewport({width: widthInt, height: heightInt});
+        await page.setViewport({width, height});
         await page.goto(url);
 
         ctx.body = await page.screenshot();
-        ctx.type = 'image/png';
+        ctx.type = config.getResponseType(body);
 
         urlCount++;
         page.close();
     });
 
-    router.post('/html', async (ctx) => {
-        const page = await browser.newPage();
-        const {html, width, height} = ctx.request.body;
+    router.post("/html", async (ctx) => {
+        const page   = await browser.newPage();
+        const body   = ctx.request.body;
+        const {html} = body;
 
-        const widthInt = parseInt(width);
-        const heightInt = parseInt(height);
+        const {width, height} = config.getDimensions(body);
 
-        await page.setViewport({width: widthInt, height: heightInt});
-        await page.goto(`data:text/html,${html}`, { waitUntil: 'load' });
+        await page.setViewport({width, height});
+        await page.goto(`data:text/html,${html}`, { waitUntil: "load" });
 
         ctx.body = await page.screenshot({omitBackground: true});
-        ctx.type = 'image/png';
+        ctx.type = config.getResponseType(body);
 
         htmlCount++;
         page.close();
@@ -69,13 +75,14 @@ async function main() {
                 };
             }
         })
-        .use(serve('./files'))
+        .use(serve("./files"))
         .use(bodyParser())
         .use(router.routes())
         .use(router.allowedMethods());
     
-    app.listen(port, '127.0.0.1');
-    console.log('Listening on :' + port);
+    const {interface, port} = config.getInterfacePort();
+    app.listen(port, interface);
+    console.log(`Listening on: ${interface}:${port}`);
 }
 
 main();

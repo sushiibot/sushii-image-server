@@ -7,6 +7,9 @@
     "parserOptions": {
         "ecmaVersion": 2017
     },
+    "plugins": [
+        "jest"
+    ],
     "rules": {
         "indent": [
             "error",
@@ -18,7 +21,7 @@
         ],
         "quotes": [
             "error",
-            "single"
+            "double"
         ],
         "semi": [
             "error",
