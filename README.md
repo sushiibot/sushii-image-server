@@ -11,7 +11,9 @@ Don't serve this publicly unless you know the risks.  Any JavaScript can be ran 
 
 ## Configuration
 
-An example configuration can be found in [`config.json`](./config.json).  These values are also given by default if a config file is not found or fields are omitted.  POST parameters will be take priority over config values.  For example, if the `width` setting in the config is set to `512` and a POST request to `/url` or `/html` has a paramter of `1028`, it will use `1028` for that specific request.
+An example configuration can be found in [`config.json`](./config.json).  These values are also given by default if a config file is not found or fields are omitted.  
+Parameter values are processed in the following priority: request parameter, configuration, default.  POST request parameters will be take priority over config and default values.  Default values will only be used if a parameter is neither given in the POST request nor configuration file.
+For example, if the `width` setting in the config is set to `512` and a POST request to `/url` or `/html` has a paramter of `1028`, it will use `1028` for that specific request.
 
 ```javascript
 {
@@ -45,13 +47,13 @@ POST /url
 
 #### Request
 
-| Parameter   | Description                                |
-| :---------- | :----------------------------------------- |
-| url         | URL to generate a screenshot of (required) |
-| width       | Screenshot width                           |
-| height      | Screenshot height                          |
-| imageFormat | Image format (png or jpeg)                 |
-| quality     | Jpeg image quality (0-100)                 |
+| Parameter   | Description                                | Default Value |
+| :---------- | :----------------------------------------- | ------------- |
+| url         | URL to generate a screenshot of (required) |               |
+| width       | Screenshot width                           | 512           |
+| height      | Screenshot height                          | 512           |
+| imageFormat | Image format (png or jpeg)                 | png           |
+| quality     | Jpeg image quality (0-100)                 | 70            |
 
 #### Example
 
@@ -74,13 +76,13 @@ POST /html
 
 #### Request
 
-| Parameter   | Description                                 |
-| :---------- | :------------------------------------------ |
-| html        | HTML to generate a screenshot of (required) |
-| width       | Screenshot width                            |
-| height      | Screenshot height                           |
-| imageFormat | Image format (png or jpeg)                  |
-| quality     | Jpeg image quality (0-100)                 |
+| Parameter   | Description                                 | Default Value |
+| :---------- | :------------------------------------------ | ------------- |
+| html        | HTML to generate a screenshot of (required) |               |
+| width       | Screenshot width                            | 512           |
+| height      | Screenshot height                           | 512           |
+| imageFormat | Image format (png or jpeg)                  | png           |
+| quality     | Jpeg image quality (0-100)                  | 70            |
 
 #### Example
 
