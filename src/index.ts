@@ -1,28 +1,33 @@
-import * as Koa        from "koa";
-import * as serve      from "koa-static";
-import * as Router     from "koa-router";
-import * as bodyParser from "koa-bodyparser";
-import * as puppeteer  from "puppeteer";
-import * as Types      from "./types";
-import pkg             from "../package.json";
-import Config          from "./config";
-
-const app    = new Koa();
-const router = new Router();
-const config = new Config();
+import Koa from "koa";
+import serve from "koa-static";
+import Router from "@koa/router";
+import bodyParser from "koa-bodyparser";
+import puppeteer from "puppeteer";
+import logger from "koa-logger";
+import { Stats, ScreenshotOptions } from "./types";
+import pkg from "../package.json";
+import Config from "./config";
 
 async function main() {
+    const config = new Config();
+    if (!config.isValid()) {
+        process.exit();
+    }
+
+    const app = new Koa();
+    const router = new Router();
+
     const browserArgs = config.getBrowserArgs();
-    const browser     = await puppeteer.launch({
+    const browser = await puppeteer.launch({
         headless: config.isHeadless(),
-        args: browserArgs
+        args: browserArgs,
     });
 
-    let urlCount  = 0;
+    let urlCount = 0;
     let htmlCount = 0;
 
     router.get("/", (ctx) => {
-        const stats: Types.Stats = {
+        const stats: Stats = {
             version: pkg.version,
             urlCount,
             htmlCount,
@@ -32,19 +37,19 @@ async function main() {
     });
 
     router.post("/url", async (ctx) => {
-        const page  = await browser.newPage();
-        const body  = ctx.request.body;
-        const {url} = body;
+        const page = await browser.newPage();
+        const body = ctx.request.body;
+        const { url } = body;
 
-        const {width, height} = config.getDimensions(body);
+        const { width, height } = config.getDimensions(body);
 
-        await page.setViewport({width, height});
+        await page.setViewport({ width, height });
         await page.goto(url);
 
         const imageFormat = config.getImageFormat(body);
-        const screenshotOptions: Types.ScreenshotOptions = {
+        const screenshotOptions: ScreenshotOptions = {
             omitBackground: true,
-            type: imageFormat
+            type: imageFormat,
         };
 
         if (imageFormat == "jpeg") {
@@ -59,19 +64,21 @@ async function main() {
     });
 
     router.post("/html", async (ctx) => {
-        const page   = await browser.newPage();
-        const body   = ctx.request.body;
-        const {html} = body;
+        const page = await browser.newPage();
+        const body = ctx.request.body;
+        const { html } = body;
 
-        const {width, height} = config.getDimensions(body);
+        const { width, height } = config.getDimensions(body);
 
-        await page.setViewport({width, height});
-        await page.goto(`data:text/html;charset=utf-8,${html}`, { waitUntil: "load" });
+        await page.setViewport({ width, height });
+        await page.goto(`data:text/html;charset=utf-8,${html}`, {
+            waitUntil: "load",
+        });
 
         const imageFormat = config.getImageFormat(body);
-        const screenshotOptions: Types.ScreenshotOptions = {
+        const screenshotOptions: ScreenshotOptions = {
             omitBackground: true,
-            type: imageFormat
+            type: imageFormat,
         };
 
         if (imageFormat == "jpeg") {
@@ -85,7 +92,7 @@ async function main() {
         page.close();
     });
 
-    app
+    app.use(logger())
         .use(async (ctx, next) => {
             try {
                 await next();
@@ -93,7 +100,7 @@ async function main() {
                 // will only respond with JSON
                 ctx.status = err.statusCode || err.status || 500;
                 ctx.body = {
-                    message: err.message
+                    message: err.message,
                 };
             }
         })
@@ -105,10 +112,6 @@ async function main() {
     const ifacePort = config.getInterfacePort();
     app.listen(ifacePort.port, ifacePort.interface);
     console.log(`Listening on: ${ifacePort.interface}:${ifacePort.port}`);
-}
-
-if (!config.isValid()) {
-    process.exit();
 }
 
 main();

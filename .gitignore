@@ -60,3 +60,5 @@ typings/
 # static files directory
 files/*
 !files/.gitkeep
+
+dist/
