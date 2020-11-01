@@ -9,6 +9,8 @@ The files directory can be used to serve static files used for HTML screenshots 
 
 Don't serve this publicly unless you know the risks. Any JavaScript can be ran on the system and local files can be accessed.
 
+## Table of Contents <!-- omit in toc -->
+
 - [Installation](#installation)
 - [Configuration](#configuration)
 - [API Endpoints](#api-endpoints)
