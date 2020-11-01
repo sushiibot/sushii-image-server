@@ -1,16 +1,13 @@
 {
     "compilerOptions": {
         "module": "commonjs",
-        "target": "es2017",
+        "target": "es2018",
+        "resolveJsonModule": true,
+        "esModuleInterop": true,
         "noImplicitAny": true,
         "outDir": "./dist",
         "sourceMap": true
     },
-    "include": [
-        "./src/**/*"
-    ],
-    "exclude": [
-        "node_modules",
-        "./src/__tests__/**/*"
-    ]
+    "include": ["./src/**/*"],
+    "exclude": ["node_modules", "./src/__tests__/**/*"]
 }
