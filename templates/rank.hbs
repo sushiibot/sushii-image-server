@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/static/tailwind.css">
+    <style type="text/css">
+        html,
+        body {
+            width: 500px;
+            height: 400px;
+            margin: 0;
+            padding: 0;
+            background: #000;
+        }
+    </style>
+</head>
+<body class="text-gray-200 bg-gray-1000">
+    <div class="container p-2">
+        <div class="p-3 py-1 flex flex-nowrap items-center">
+            <!-- Avatar -->
+            <div class="relative mr-3 flex-none">
+                <img class="rounded-full w-20 shadow-md" src="{{ AVATAR_URL }}" />
+                <!-- Online status -->
+                <div class="hidden rounded-full w-4 h-4 ring-4 bg-green-400 ring-gray-1000 absolute bottom-0 right-1 z-10"></div>
+            </div>
+            <!-- Userinfo -->
+            <div class="flex-1 self-center min-w-0">
+                <h1 class="w-full py-2 text-4xl font-medium truncate">
+                    {{ USERNAME }}
+                </h1>
+                <h2 class="text-lg leading-4 text-gray-500">
+                    #{{ DISCRIMINATOR }}
+                </h2>
+            </div>
+        </div>
+    </div>
+    <div class="p-2 pt-0 bg-gray-1000">
+        <!-- Badges and emojis -->
+        <div class="p-2 pt-0 h-10">
+            {{#if IS_PATRON }}
+            <img class="w-6 inline" src="{{ PATRON_EMOJI_URL }}" />
+            {{/if}}
+            <img class="ml-2 w-6 inline" src="/static/img/{{REP_LEVEL}}.png" />
+        </div>
+        <div class="grid grid-cols-2 gap-x-3">
+            <!-- Left side -->
+            <div>
+                <!-- Rep and Fishies -->
+                <!-- <div class="mb-2 p-2 px-3 grid grid-cols-2 rounded bg-gradient-to-br from-purple-400 via-pink-500 to-red-500"> -->
+                <div class="mb-2 p-2 pt-3 px-3 grid grid-cols-2 rounded-lg shadow-md bg-gradient-to-br from-purple-400 via-blue-500 to-teal-500 ">
+                    <p class="text-2xl font-medium leading-5">
+                        {{ REP }}
+                        <br>
+                        <span class="text-gray-200 text-base font-normal">
+                            <svg class="w-4 inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                            </svg>
+                            rep
+                        </span>
+                    </p>
+                    <p class="text-2xl font-medium leading-5 text-right">
+                        {{ FISHIES }}
+                        <br>
+                        <span class="text-gray-200 text-base font-normal">
+                            <svg class="w-4 inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7.858 5.485a1 1 0 00-1.715 1.03L7.633 9H7a1 1 0 100 2h1.834l.166.277V12H7a1 1 0 100 2h2v1a1 1 0 102 0v-1h2a1 1 0 100-2h-2v-.723l.166-.277H13a1 1 0 100-2h-.634l1.492-2.486a1 1 0 10-1.716-1.029L10.034 9h-.068L7.858 5.485z" clip-rule="evenodd" />
+                            </svg>
+                            fishies
+                        </span>
+                    </p>
+                </div>
+                <!-- Level and XP bars -->
+                <div class="mt-3 p-3 pt-2 bg-gray-900 rounded shadow-md">
+                    {{#*inline "level" }}
+                        <div class="relative">
+                            <p class="leading-4 inline">
+                                {{> @partial-block }}
+                                {{ name }}
+                                <br>
+                                <span class="text-2xl font-medium">
+                                    {{ level }}
+                                </span>
+                            </p>
+                            <p class="text-sm text-gray-500 absolute bottom-0 right-0">
+                                {{ xp }} / {{ level_xp }} XP
+                            </p>
+                        </div>
+                        <div class="mt-1 mb-1 w-full h-1 bg-gray-800 rounded">
+                            <div class="rounded h-full {{ gradient }}" style="width: {{ progress }}%"></div>
+                        </div>
+                    {{/inline}}
+                    {{#> level
+                        name="server level"
+                        level=LEVEL
+                        xp=CURR_XP
+                        level_xp=REQ_XP
+                        progress=XP_PROGRESS
+                        gradient="bg-gradient-to-r from-teal-400 to-blue-500"
+                    }}
+                    <svg class="w-4 inline pb-0.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M4.293 15.707a1 1 0 010-1.414l5-5a1 1 0 011.414 0l5 5a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414 0zm0-6a1 1 0 010-1.414l5-5a1 1 0 011.414 0l5 5a1 1 0 01-1.414 1.414L10 5.414 5.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                    </svg>
+                    {{/level}}
+                    <div class="h-4"></div>
+                    {{#>
+                        level
+                        name="global level"
+                        level=GLOBAL_LEVEL
+                        xp=GLOBAL_CURR_XP
+                        level_xp=GLOBAL_REQ_XP
+                        progress=GLOBAL_XP_PROGRESS
+                        gradient="bg-gradient-to-r from-purple-400 via-pink-500 to-red-500"
+                    }}
+                    <svg class="w-4 inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M4.083 9h1.946c.089-1.546.383-2.97.837-4.118A6.004 6.004 0 004.083 9zM10 2a8 8 0 100 16 8 8 0 000-16zm0 2c-.076 0-.232.032-.465.262-.238.234-.497.623-.737 1.182-.389.907-.673 2.142-.766 3.556h3.936c-.093-1.414-.377-2.649-.766-3.556-.24-.56-.5-.948-.737-1.182C10.232 4.032 10.076 4 10 4zm3.971 5c-.089-1.546-.383-2.97-.837-4.118A6.004 6.004 0 0115.917 9h-1.946zm-2.003 2H8.032c.093 1.414.377 2.649.766 3.556.24.56.5.948.737 1.182.233.23.389.262.465.262.076 0 .232-.032.465-.262.238-.234.498-.623.737-1.182.389-.907.673-2.142.766-3.556zm1.166 4.118c.454-1.147.748-2.572.837-4.118h1.946a6.004 6.004 0 01-2.783 4.118zm-6.268 0C6.412 13.97 6.118 12.546 6.03 11H4.083a6.004 6.004 0 002.783 4.118z" clip-rule="evenodd" />
+                    </svg>
+                    {{/level}}
+                </div>
+            </div>
+            <!-- Ranking -->
+            <div class="bg-gray-900 rounded shadow">
+                <svg class="ml-3 w-4 inline-block" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" />
+                </svg>
+                <p class="mt-3 ml-1 inline-block">
+                    rank
+                </p>
+                <div class="mt-1 grid grid-rows-4">
+                    {{#*inline "rank" }}
+                        <div class="{{#unless noPad}}px-3 {{/unless}} flex no-wrap justify-between items-center">
+                            <div class="flex-grow-0">
+                                <p class="truncate text-sm text-gray-600 w-36">
+                                    <span class="text-gray-200 text-4xl font-medium">
+                                        {{ rank ~}}
+                                    </span>/{{ total }}
+                                </p>
+                            </div>
+                            <p class="text-gray-500">
+                                {{ name }}
+                            </p>
+                        </div>
+                    {{/inline}}
+                    <div class="py-1 mx-2 px-2 rounded-lg bg-gray-800 shadow mb-1">
+                        {{> rank name="all" rank=RANK_ALL total=RANK_ALL_TOTAL noPad=true }}
+                    </div>
+                    {{> rank name="day" rank=RANK_DAY total=RANK_DAY_TOTAL }}
+                    {{> rank name="week" rank=RANK_WEEK total=RANK_WEEK_TOTAL }}
+                    {{> rank name="month" rank=RANK_MONTH total=RANK_MONTH_TOTAL }}
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
