@@ -6,16 +6,18 @@
     "scripts": {
         "build": "tsc",
         "test": "jest",
-        "start": "npm run build && node dist/src/index.js"
+        "start": "yarn run build && node dist/src/index.js"
     },
     "author": "Derrick Lee <derrick@dlee.dev>",
     "repository": {
         "type": "git",
-        "url": "https://github.com/drklee3/sushii-image-server.git"
+        "url": "https://github.com/sushiibot/sushii-image-server.git"
     },
     "license": "ISC",
     "dependencies": {
         "@koa/router": "^9.4.0",
+        "dotenv": "^8.2.0",
+        "handlebars": "^4.7.6",
         "koa": "^2.13.0",
         "koa-bodyparser": "^4.3.0",
         "koa-logger": "^3.2.1",
