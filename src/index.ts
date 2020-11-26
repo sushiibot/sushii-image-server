@@ -7,8 +7,38 @@ import logger from "koa-logger";
 import { Stats, ScreenshotOptions } from "./types";
 import pkg from "../package.json";
 import Config from "./config";
+import Handlebars, { template } from "handlebars";
+import fs from "fs";
+import util from "util";
+import path from "path";
+import dotenv from "dotenv";
+
+async function compileTemplates(templatesDir: string) {
+    const readdir = util.promisify(fs.readdir);
+    const readFile = util.promisify(fs.readFile);
+
+    const files = await readdir(templatesDir, "utf-8");
+    const templates = new Map();
+
+    for (let i = 0; i < files.length; i++) {
+        const filePath = path.join(templatesDir, files[i]);
+        const content = await readFile(filePath);
+
+        const fileName = path
+            .basename(filePath)
+            .replace(path.extname(filePath), "");
+
+        templates.set(fileName, Handlebars.compile(content.toString()));
+    }
+
+    return templates;
+}
 
 async function main() {
+    dotenv.config();
+
+    const { TEMPLATES_DIR = "./templates" } = process.env;
+
     const config = new Config();
     if (!config.isValid()) {
         process.exit();
@@ -16,6 +46,7 @@ async function main() {
 
     const app = new Koa();
     const router = new Router();
+    const templates = await compileTemplates(TEMPLATES_DIR);
 
     const browserArgs = config.getBrowserArgs();
     const browser = await puppeteer.launch({
@@ -59,21 +90,21 @@ async function main() {
         ctx.body = await page.screenshot(screenshotOptions);
         ctx.type = config.getResponseType(body);
 
-        urlCount++;
         page.close();
     });
 
-    router.post("/html", async (ctx) => {
+    async function renderHtml(ctx: Koa.Context, html: string) {
         const page = await browser.newPage();
         const body = ctx.request.body;
-        const { html } = body;
 
         const { width, height } = config.getDimensions(body);
 
+        // Encode HTML string in base64
+        const buff = Buffer.from(html, "utf-8");
+        const htmlBase64 = buff.toString("base64");
+
         await page.setViewport({ width, height });
-        await page.goto(`data:text/html;charset=utf-8,${html}`, {
-            waitUntil: "load",
-        });
+        await page.goto(`data:text/html;charset=utf-8;base64,${htmlBase64}`);
 
         const imageFormat = config.getImageFormat(body);
         const screenshotOptions: ScreenshotOptions = {
@@ -88,8 +119,20 @@ async function main() {
         ctx.body = await page.screenshot(screenshotOptions);
         ctx.type = config.getResponseType(body);
 
-        htmlCount++;
         page.close();
+    }
+
+    router.post("/html", async (ctx) => {
+        await renderHtml(ctx, ctx.request.body.html);
+    });
+
+    router.post("/template", async (ctx) => {
+        const { templateName, context } = ctx.request.body;
+
+        const template = templates.get(templateName);
+        const html = template(context);
+
+        await renderHtml(ctx, html);
     });
 
     app.use(logger())
@@ -97,6 +140,7 @@ async function main() {
             try {
                 await next();
             } catch (err) {
+                console.error(err);
                 // will only respond with JSON
                 ctx.status = err.statusCode || err.status || 500;
                 ctx.body = {
