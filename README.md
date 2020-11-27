@@ -2,12 +2,15 @@
 
 [![Build Status](https://travis-ci.org/drklee3/sushii-image-server.svg?branch=master)](https://travis-ci.org/drklee3/sushii-image-server)
 
-Simple local web server made with [Koa](https://github.com/koajs/koa) and [puppeteer](https://github.com/GoogleChrome/puppeteer) to generate images for [sushii-bot](https://github.com/drklee3/sushii-bot).
-The files directory can be used to serve static files used for HTML screenshots (e.g., JavaScript files).
+Simple local web server made with [Koa](https://github.com/koajs/koa) and
+[puppeteer](https://github.com/GoogleChrome/puppeteer) to generate images for
+[sushii-bot](https://github.com/drklee3/sushii-bot). The files directory can be
+used to serve static files used for HTML screenshots (e.g., JavaScript files).
 
 ## ⚠ Warning <!-- omit in toc -->
 
-Don't serve this publicly unless you know the risks. Any JavaScript can be ran on the system and local files can be accessed.
+Don't serve this publicly unless you know the risks. Any JavaScript code can be
+run on the system and local files can be accessed.
 
 ## Table of Contents <!-- omit in toc -->
 
@@ -48,13 +51,20 @@ Don't serve this publicly unless you know the risks. Any JavaScript can be ran o
     sudo apt-get install -y gconf-service libasound2 libatk1.0-0 libc6 libcairo2 libcups2 libdbus-1-3 libexpat1 libfontconfig1 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 libglib2.0-0 libgtk-3-0 libnspr4 libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 ca-certificates fonts-liberation libappindicator1 libnss3 lsb-release xdg-utils wget
     ```
 
-5. Build TypeScript files and start with `npm start` or with a process manager like [PM2](https://github.com/Unitech/pm2).
+5. Build TypeScript files and start with `npm start` or with a process manager
+   like [PM2](https://github.com/Unitech/pm2).
 
 ## Configuration
 
-An example configuration can be found in [`config.json`](./config.json). These values are also given by default if a config file is not found or fields are omitted.  
-Parameter values are processed in the following priority: request parameter, configuration, default. POST request parameters will be take priority over config and default values. Default values will only be used if a parameter is neither given in the POST request nor configuration file.
-For example, if the `width` setting in the config is set to `512` and a POST request to `/url` or `/html` has a paramter of `1028`, it will use `1028` for that specific request.
+An example configuration can be found in [`config.json`](./config.json). These
+values are also given by default if a config file is not found or fields are
+omitted.
+Parameter values are processed in the following priority: request parameter,
+configuration, default. POST request parameters will be take priority over
+config and default values. Default values will only be used if a parameter is
+neither given in the POST request nor configuration file. For example, if the
+`width` setting in the config is set to `512` and a POST request to `/url` or
+`/html` has a paramter of `1028`, it will use `1028` for that specific request.
 
 ```javascript
 {
