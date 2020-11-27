@@ -18,7 +18,7 @@ async function compileTemplates(templatesDir: string) {
     const readFile = util.promisify(fs.readFile);
 
     const files = await readdir(templatesDir, "utf-8");
-    const templates = new Map();
+    const templates: Map<string, HandlebarsTemplateDelegate> = new Map();
 
     for (let i = 0; i < files.length; i++) {
         const filePath = path.join(templatesDir, files[i]);
@@ -130,6 +130,10 @@ async function main() {
         const { templateName, context } = ctx.request.body;
 
         const template = templates.get(templateName);
+        if (!template) {
+            throw Error(`No template named ${templateName} found`);
+        }
+
         const html = template(context);
 
         await renderHtml(ctx, html);
