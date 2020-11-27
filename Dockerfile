@@ -1,7 +1,7 @@
 # Based on puppeteer's CI Dockerfile
 # https://github.com/puppeteer/puppeteer/blob/main/.ci/node12/Dockerfile.linux
 
-FROM node:12
+FROM node:14
 
 RUN apt-get update && \
     apt-get -y install xvfb gconf-service libasound2 libatk1.0-0 libc6 libcairo2 libcups2 \
@@ -12,15 +12,15 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Add user so we don't need --no-sandbox.
-RUN groupadd -r sushii && useradd -r -g sushii -G audio,video sushii \
-    && mkdir -p /home/sushii/Downloads \
-    && chown -R sushii:sushii /home/sushii
+RUN groupadd -r pptruser && useradd -r -g pptruser -G audio,video pptruser \
+    && mkdir -p /home/pptruser/Downloads \
+    && chown -R pptruser:pptruser /home/pptruser
 
 # Run everything after as non-privileged user.
-USER sushii
+USER pptruser
 
 # Create workdir
-WORKDIR /home/sushii
+WORKDIR /home/pptruser
 
 # Copy and install dependencies
 COPY package.json yarn.lock ./
