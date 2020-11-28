@@ -1,6 +1,6 @@
 # sushii-image-server <!-- omit in toc -->
 
-[![Build Status](https://travis-ci.org/drklee3/sushii-image-server.svg?branch=master)](https://travis-ci.org/drklee3/sushii-image-server)
+[![CI](https://github.com/sushiibot/sushii-image-server/workflows/CI/badge.svg)](https://github.com/sushiibot/sushii-image-server/actions?query=workflow%3ACI)
 
 Simple local web server made with [Koa](https://github.com/koajs/koa) and
 [puppeteer](https://github.com/GoogleChrome/puppeteer) to generate images for
