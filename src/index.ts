@@ -7,13 +7,13 @@ import logger from "koa-logger";
 import { Stats, ScreenshotOptions } from "./types";
 import pkg from "../package.json";
 import Config from "./config";
-import Handlebars, { template } from "handlebars";
+import Handlebars from "handlebars";
 import fs from "fs";
 import util from "util";
 import path from "path";
 import dotenv from "dotenv";
 
-async function compileTemplates(
+export async function compileTemplates(
     templatesDir: string
 ): Promise<Map<string, HandlebarsTemplateDelegate>> {
     const readdir = util.promisify(fs.readdir);
@@ -167,4 +167,6 @@ async function main() {
     console.log(`Listening on: ${ifacePort.interface}:${ifacePort.port}`);
 }
 
-main();
+if (require.main === module) {
+    main();
+}
