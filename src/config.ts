@@ -1,7 +1,8 @@
-import * as fs from "fs";
 import * as Types from "./types";
 
-interface Config {
+function env() {}
+
+export default class Config {
     interface?: string;
     port?: number;
 
@@ -13,25 +14,27 @@ interface Config {
 
     imageFormat?: Types.ImageFormat;
     quality?: number;
-}
 
-export default class ConfigReader {
-    config: Config;
-    
-    constructor(location = "./config.json") {
-        this._readConfig(location);
-    }
+    constructor() {
+        const {
+            SUSHII_IMG_INTERFACE,
+            SUSHII_IMG_PORT,
+            SUSHII_IMG_HEADLESS,
+            SUSHII_IMG_BROWSER_ARGS,
+            SUSHII_IMG_WIDTH,
+            SUSHII_IMG_HEIGHT,
+            SUSHII_IMG_IMAGE_FORMAT,
+            SUSHII_IMG_QUALITY,
+        } = process.env;
 
-    _readConfig(location: string) {
-        try {
-            this.config = JSON.parse(fs.readFileSync(location, "utf8"));
-        } catch (err) {
-            if (err.code === "ENOENT") {
-                console.log("Config not found, using default values");
-            } else {
-                console.log("Something went wrong reading config file");
-            }
-        }
+        this.interface = SUSHII_IMG_INTERFACE;
+        this.port = parseInt(SUSHII_IMG_PORT) | 3000;
+        this.headless = SUSHII_IMG_HEADLESS === "true";
+        this.browserArgs = SUSHII_IMG_BROWSER_ARGS;
+        this.width = parseInt(SUSHII_IMG_WIDTH);
+        this.height = parseInt(SUSHII_IMG_HEIGHT);
+        this.imageFormat = SUSHII_IMG_IMAGE_FORMAT as Types.ImageFormat;
+        this.quality = parseInt(SUSHII_IMG_QUALITY);
     }
 
     /**
@@ -39,45 +42,40 @@ export default class ConfigReader {
      */
     _getConfigErrors(): string[] {
         const errors: string[] = [];
-        
+
         try {
             // should return with either config value or default
             // default value should obviously not error or I'm dumb
-            const _ = this.getImageFormat({})
+            const _ = this.getImageFormat({});
         } catch (err) {
             errors.push("imageFormat (string)");
         }
 
-        // default values so ignore rest
-        if (this.config === undefined) {
-            return errors;
-        }
-
-        if (this.config.interface && typeof this.config.interface !== "string") {
+        if (this.interface && typeof this.interface !== "string") {
             errors.push("interface (string)");
         }
 
-        if (this.config.port && typeof this.config.port !== "number") {
-            errors.push("port (number)")
+        if (this.port && typeof this.port !== "number") {
+            errors.push("port (number)");
         }
-        
-        if (this.config.headless && typeof this.config.headless !== "boolean") {
+
+        if (this.headless && typeof this.headless !== "boolean") {
             errors.push("headless (boolean)");
         }
 
-        if (this.config.browserArgs && typeof this.config.browserArgs !== "string") {
+        if (this.browserArgs && typeof this.browserArgs !== "string") {
             errors.push("browserArgs (string)");
         }
 
-        if (this.config.width && typeof this.config.width !== "number") {
+        if (this.width && typeof this.width !== "number") {
             errors.push("width (number)");
         }
 
-        if (this.config.height && typeof this.config.height !== "number") {
+        if (this.height && typeof this.height !== "number") {
             errors.push("height (number)");
         }
 
-        if (this.config.quality && typeof this.config.quality !== "number") {
+        if (this.quality && typeof this.quality !== "number") {
             errors.push("quality (number)");
         }
 
@@ -92,7 +90,9 @@ export default class ConfigReader {
         }
 
         const errStr = errs.join("\n\t");
-        console.log(`The following fields in your configuration have incorrect types:\n\t${errStr}`);
+        console.log(
+            `The following fields in your configuration have incorrect types:\n\t${errStr}`
+        );
         return false;
     }
 
@@ -100,8 +100,8 @@ export default class ConfigReader {
      * Gets the option if the background browser should run headless
      */
     isHeadless(): boolean {
-        if (this.config && this.config.headless !== undefined) {
-            return this.config.headless;
+        if (this.headless !== undefined) {
+            return this.headless;
         }
 
         return true;
@@ -111,8 +111,8 @@ export default class ConfigReader {
      * Gets the chromium browser args from config
      */
     getBrowserArgs(): string[] {
-        if (this.config && this.config.browserArgs !== undefined) {
-            return this.config.browserArgs.split(" ");
+        if (this.browserArgs !== undefined) {
+            return this.browserArgs.split(" ");
         }
 
         return [];
@@ -122,8 +122,8 @@ export default class ConfigReader {
      * Gets the HTTP server interface
      */
     _getInterface(): string {
-        if (this.config && this.config.interface !== undefined) {
-            return this.config.interface;
+        if (this.interface !== undefined) {
+            return this.interface;
         }
 
         // default run on localhost, don't want to expose publicly
@@ -134,8 +134,8 @@ export default class ConfigReader {
      * Gets the HTTP server port
      */
     _getPort(): number {
-        if (this.config && this.config.port !== undefined) {
-            return this.config.port;
+        if (this.port !== undefined) {
+            return this.port;
         }
 
         return 3000;
@@ -155,19 +155,19 @@ export default class ConfigReader {
 
     /**
      * Gets the image format for the response
-     * 
+     *
      * @param body HTTP request body
      */
     _getImageFormat(body: Types.Body): string {
-        let {imageFormat} = body;
+        let { imageFormat } = body;
         // post body type
         if (imageFormat !== undefined) {
             return imageFormat;
         }
 
         // config type
-        if (this.config && this.config.imageFormat !== undefined) {
-            return this.config.imageFormat;
+        if (this.imageFormat !== undefined) {
+            return this.imageFormat;
         }
 
         // none given in args or config
@@ -176,7 +176,7 @@ export default class ConfigReader {
 
     /**
      * Checks if a given format is valid
-     * 
+     *
      * @param value Format value to test
      */
     _isValidFormat(value: string): value is Types.ImageFormat {
@@ -187,7 +187,7 @@ export default class ConfigReader {
 
     /**
      * Gets the validated image format for the response
-     * 
+     *
      * @param body HTTP request body
      * @returns    Image format
      */
@@ -208,20 +208,20 @@ export default class ConfigReader {
 
     /**
      * Gets the Content-Type for the response
-     * 
+     *
      * @param body HTTP request body
      * @returns    Response Type
      */
     getResponseType(body: Types.Body): Types.ResponseType {
         const type = this.getImageFormat(body);
         const responseType = `image/${type}`;
-        
+
         return responseType as Types.ResponseType;
     }
 
     /**
      * Gets a single image and view port dimension
-     * 
+     *
      * @param value Value of a single dimension
      * @param dim   Dimension to look up (width / height)
      * @returns     A single image / viewport dimension
@@ -231,8 +231,8 @@ export default class ConfigReader {
             return parseInt(value);
         }
 
-        if (this.config && this.config[dim] !== undefined) {
-            return this.config[dim];
+        if (this[dim] !== undefined) {
+            return this[dim];
         }
 
         return 512;
@@ -240,12 +240,12 @@ export default class ConfigReader {
 
     /**
      * Gets image and viewport dimensions
-     * 
+     *
      * @param body HTTP request body
      * @returns    Image / viewport dimensions
      */
     getDimensions(body: Types.Body): Types.Dimensions {
-        let {width, height} = body;
+        let { width, height } = body;
 
         let dimensions: Types.Dimensions = {
             width: this._getDimension(width, "width"),
@@ -261,16 +261,16 @@ export default class ConfigReader {
      * @returns    Quality value
      */
     getQuality(body: Types.Body): number {
-        let {quality} = body;
-        
+        let { quality } = body;
+
         if (quality !== undefined) {
             return parseInt(quality);
         }
 
-        if (this.config && this.config.quality !== undefined) {
-            return this.config.quality;
+        if (this.quality !== undefined) {
+            return this.quality;
         }
 
         return 70;
     }
-};
+}

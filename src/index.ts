@@ -13,7 +13,9 @@ import util from "util";
 import path from "path";
 import dotenv from "dotenv";
 
-async function compileTemplates(templatesDir: string) {
+async function compileTemplates(
+    templatesDir: string
+): Promise<Map<string, HandlebarsTemplateDelegate>> {
     const readdir = util.promisify(fs.readdir);
     const readFile = util.promisify(fs.readFile);
 
@@ -46,7 +48,10 @@ async function main() {
 
     const app = new Koa();
     const router = new Router();
-    const templates = await compileTemplates(TEMPLATES_DIR);
+    const templates = await compileTemplates(TEMPLATES_DIR).catch((e) => {
+        console.log("Error compiling templates: ", e);
+        process.exit(1);
+    });
 
     const browserArgs = config.getBrowserArgs();
     const browser = await puppeteer.launch({
