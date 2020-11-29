@@ -36,27 +36,24 @@ export async function compileTemplates(
     return templates;
 }
 
-async function main() {
+export async function getApp(config: Config): Promise<Koa> {
     dotenv.config();
-
-    const { TEMPLATES_DIR = "./templates" } = process.env;
-
-    const config = new Config();
-    if (!config.isValid()) {
-        process.exit();
-    }
 
     const app = new Koa();
     const router = new Router();
-    const templates = await compileTemplates(TEMPLATES_DIR).catch((e) => {
-        console.log("Error compiling templates: ", e);
-        process.exit(1);
-    });
 
-    const browserArgs = config.getBrowserArgs();
-    const browser = await puppeteer.launch({
-        headless: config.isHeadless(),
-        args: browserArgs,
+    // Add templates to context
+    app.context.templates = await compileTemplates(config.templatesDir).catch(
+        (e) => {
+            console.log("Error compiling templates: ", e);
+            process.exit(1);
+        }
+    );
+
+    // Add browser to context
+    app.context.browser = await puppeteer.launch({
+        headless: config.headless,
+        args: config.browserArgs,
     });
 
     let urlCount = 0;
@@ -72,8 +69,8 @@ async function main() {
         ctx.body = stats;
     });
 
-    router.post("/url", async (ctx) => {
-        const page = await browser.newPage();
+    router.post("/url", async (ctx: Koa.Context) => {
+        const page = await ctx.browser.newPage();
         const body = ctx.request.body;
         const { url } = body;
 
@@ -99,7 +96,7 @@ async function main() {
     });
 
     async function renderHtml(ctx: Koa.Context, html: string) {
-        const page = await browser.newPage();
+        const page = await ctx.browser.newPage();
         const body = ctx.request.body;
 
         const { width, height } = config.getDimensions(body);
@@ -127,16 +124,31 @@ async function main() {
         page.close();
     }
 
-    router.post("/html", async (ctx) => {
+    router.post("/html", async (ctx: Koa.Context) => {
         await renderHtml(ctx, ctx.request.body.html);
     });
 
-    router.post("/template", async (ctx) => {
-        const { templateName, context } = ctx.request.body;
+    router.post("/template", async (ctx: Koa.Context) => {
+        const { templateName, templateHtml, context } = ctx.request.body;
 
-        const template = templates.get(templateName);
-        if (!template) {
-            throw Error(`No template named ${templateName} found`);
+        if (!templateName && !templateHtml) {
+            throw Error("Missing templateName or templateHtml");
+        }
+
+        let template;
+
+        // Name of template
+        if (templateName) {
+            template = ctx.templates.get(templateName);
+
+            if (!template) {
+                throw Error(`No template named ${templateName} found`);
+            }
+        }
+
+        // String template
+        if (templateHtml) {
+            template = Handlebars.compile(templateHtml);
         }
 
         const html = template(context);
@@ -145,26 +157,21 @@ async function main() {
     });
 
     app.use(logger())
-        .use(async (ctx, next) => {
-            try {
-                await next();
-            } catch (err) {
-                console.error(err);
-                // will only respond with JSON
-                ctx.status = err.statusCode || err.status || 500;
-                ctx.body = {
-                    message: err.message,
-                };
-            }
-        })
         .use(serve("./files"))
         .use(bodyParser())
         .use(router.routes())
         .use(router.allowedMethods());
 
-    const ifacePort = config.getInterfacePort();
-    app.listen(ifacePort.port, ifacePort.interface);
-    console.log(`Listening on: ${ifacePort.interface}:${ifacePort.port}`);
+    return app;
+}
+
+export async function main() {
+    dotenv.config();
+    const config = new Config();
+
+    const app = await getApp(config);
+    app.listen(config.port, config.interface);
+    console.log(`Listening on: ${config.interface}:${config.port}`);
 }
 
 if (require.main === module) {
