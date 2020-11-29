@@ -129,7 +129,8 @@ export async function getApp(config: Config): Promise<Koa> {
     });
 
     router.post("/template", async (ctx: Koa.Context) => {
-        const { templateName, templateHtml, context } = ctx.request.body;
+        const { templateName, templateHtml } = ctx.request.body;
+        let { context } = ctx.request.body;
 
         if (!templateName && !templateHtml) {
             throw Error("Missing templateName or templateHtml");
@@ -149,6 +150,10 @@ export async function getApp(config: Config): Promise<Koa> {
         // String template
         if (templateHtml) {
             template = Handlebars.compile(templateHtml);
+        }
+
+        if (typeof context === "string") {
+            context = JSON.parse(context);
         }
 
         const html = template(context);
