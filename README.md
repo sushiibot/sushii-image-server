@@ -19,14 +19,6 @@ run on the system and local files can be accessed.
   - [Without Docker](#without-docker)
 - [Configuration](#configuration)
 - [API Endpoints](#api-endpoints)
-  - [Generate a screenshot of given url](#generate-a-screenshot-of-given-url)
-    - [Request](#request)
-    - [Example](#example)
-  - [Generate a screenshot of given HTML](#generate-a-screenshot-of-given-html)
-    - [Request](#request-1)
-    - [Example](#example-1)
-  - [Get image server statistics](#get-image-server-statistics)
-    - [Example](#example-2)
 
 ## Running
 
@@ -98,70 +90,78 @@ SUSHII_IMG_QUALITY=70
 
 ## API Endpoints
 
-### Generate a screenshot of given url
+* `POST /url`
+  Generate a screenshot of given url
 
-```text
-POST /url
-```
+  | Parameter   | Description                                | Default Value |
+  | :---------- | :----------------------------------------- | ------------- |
+  | url         | URL to generate a screenshot of (required) |               |
+  | width       | Screenshot width                           | 512           |
+  | height      | Screenshot height                          | 512           |
+  | imageFormat | Image format (png or jpeg)                 | png           |
+  | quality     | Jpeg image quality (0-100)                 | 70            |
 
-#### Request
+  ```bash
+  curl localhost:3000/url \
+      -d url=https://google.com \
+      -d width=1280 \
+      -d height=720 \
+      -d imageFormat=jpeg \
+      -d quality=90 > image.jpg
+  ```
 
-| Parameter   | Description                                | Default Value |
-| :---------- | :----------------------------------------- | ------------- |
-| url         | URL to generate a screenshot of (required) |               |
-| width       | Screenshot width                           | 512           |
-| height      | Screenshot height                          | 512           |
-| imageFormat | Image format (png or jpeg)                 | png           |
-| quality     | Jpeg image quality (0-100)                 | 70            |
+* `POST /html`
+  Generate a screenshot of given HTML
 
-#### Example
+  | key         | Description                                 | Default Value |
+  | :---------- | :------------------------------------------ | ------------- |
+  | html        | HTML to generate a screenshot of (required) |               |
+  | width       | Screenshot width                            | 512           |
+  | height      | Screenshot height                           | 512           |
+  | imageFormat | Image format (png or jpeg)                  | png           |
+  | quality     | Jpeg image quality (0-100)                  | 70            |
 
-```bash
-curl localhost:3000/url \
-    -d url=https://google.com \
-    -d width=1280 \
-    -d height=720 \
-    -d imageFormat=jpeg \
-    -d quality=90 > image.jpg
-```
+  ```bash
+  curl localhost:3000/html \
+      -d html=hi \
+      -d width=1280 \
+      -d height=720 \
+      -d imageFormat=png > image.png
+  ```
 
----
+* `POST / template`
+  Generate a screenshot of Handlebars template. One of `templateHtml` or
+  `templateName` is required.
 
-### Generate a screenshot of given HTML
+  | Key          | Description                                  | Default Value |
+  | :----------- | :------------------------------------------- | ------------- |
+  | templateHtml | Handlebars template HTML                     |               |
+  | templateName | Name of Handlebars template in `./templates` |               |
+  | width        | Screenshot width                             | 512           |
+  | height       | Screenshot height                            | 512           |
+  | imageFormat  | Image format (png or jpeg)                   | png           |
+  | quality      | Jpeg image quality (0-100)                   | 70            |
 
-```text
-POST /html
-```
+  ```bash
+  curl localhost:3000/template \
+      -d templateName=test \
+      -d '{"name": "Bob" }' \
+      -d width=1280 \
+      -d height=720 \
+      -d imageFormat=png > image.png
 
-#### Request
+  curl localhost:3000/template \
+      -d templateHtml="<p>Hello, {{name}}</p>" \
+      -d '{"name": "Bob" }' \
+      -d width=1280 \
+      -d height=720 \
+      -d imageFormat=png > image.png
+  ```
 
-| Parameter   | Description                                 | Default Value |
-| :---------- | :------------------------------------------ | ------------- |
-| html        | HTML to generate a screenshot of (required) |               |
-| width       | Screenshot width                            | 512           |
-| height      | Screenshot height                           | 512           |
-| imageFormat | Image format (png or jpeg)                  | png           |
-| quality     | Jpeg image quality (0-100)                  | 70            |
+* `GET /`
+  Get image server statistics
 
-#### Example
-
-```bash
-curl localhost:3000/html \
-    -d html=hi \
-    -d width=1280 \
-    -d height=720 \
-    -d imageFormat=png > image.png
-```
-
-### Get image server statistics
-
-```text
-GET /
-```
-
-#### Example
-
-```bash
-$ curl localhost:3000
-{"version":"3.0.0","urlCount":3,"htmlCount":3,"totalCount":6}
-```
+  ```bash
+  $ curl localhost:3000
+  {"version":"3.0.0","urlCount":3,"htmlCount":3,"totalCount":6}
+  ```
