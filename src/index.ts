@@ -37,8 +37,6 @@ export async function compileTemplates(
 }
 
 export async function getApp(config: Config): Promise<Koa> {
-    dotenv.config();
-
     const app = new Koa();
     const router = new Router();
 
@@ -176,6 +174,7 @@ export async function main() {
 
     const app = await getApp(config);
     app.listen(config.port, config.interface);
+
     console.log(`Listening on: ${config.interface}:${config.port}`);
 }
 
