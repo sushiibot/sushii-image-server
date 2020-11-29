@@ -35,11 +35,11 @@ export interface TemplateBodyName extends TemplateBodyContext {
     templateName: string;
 }
 
-export interface TemplateBodyString extends TemplateBodyContext {
-    templateString: string;
+export interface TemplateBodyHtml extends TemplateBodyContext {
+    templateHtml: string;
 }
 
-export type TemplateBody = TemplateBodyName | TemplateBodyString;
+export type TemplateBody = TemplateBodyName | TemplateBodyHtml;
 
 export interface Dimensions {
     width: number;

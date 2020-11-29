@@ -4,153 +4,44 @@ function env() {}
 
 export default class Config {
     interface?: string;
-    port?: number;
+    port: number;
 
-    headless?: boolean;
-    browserArgs?: string;
+    headless: boolean;
+    browserArgs: string[];
 
-    width?: number;
-    height?: number;
+    width: number;
+    height: number;
 
-    imageFormat?: Types.ImageFormat;
-    quality?: number;
+    imageFormat: Types.ImageFormat;
+    quality: number;
+
+    templatesDir: string;
 
     constructor() {
         const {
-            SUSHII_IMG_INTERFACE,
-            SUSHII_IMG_PORT,
-            SUSHII_IMG_HEADLESS,
-            SUSHII_IMG_BROWSER_ARGS,
-            SUSHII_IMG_WIDTH,
-            SUSHII_IMG_HEIGHT,
-            SUSHII_IMG_IMAGE_FORMAT,
-            SUSHII_IMG_QUALITY,
+            SUSHII_IMG_INTERFACE = "0.0.0.0",
+            SUSHII_IMG_PORT = "3000",
+            SUSHII_IMG_HEADLESS = "true",
+            SUSHII_IMG_BROWSER_ARGS = "",
+            SUSHII_IMG_WIDTH = "512",
+            SUSHII_IMG_HEIGHT = "512",
+            SUSHII_IMG_IMAGE_FORMAT = "png",
+            SUSHII_IMG_QUALITY = "70",
+            SUSHII_TEMPLATES_DIR = "./templates",
         } = process.env;
 
         this.interface = SUSHII_IMG_INTERFACE;
-        this.port = parseInt(SUSHII_IMG_PORT) | 3000;
-        this.headless = SUSHII_IMG_HEADLESS === "true";
-        this.browserArgs = SUSHII_IMG_BROWSER_ARGS;
-        this.width = parseInt(SUSHII_IMG_WIDTH);
-        this.height = parseInt(SUSHII_IMG_HEIGHT);
-        this.imageFormat = SUSHII_IMG_IMAGE_FORMAT as Types.ImageFormat;
-        this.quality = parseInt(SUSHII_IMG_QUALITY);
-    }
-
-    /**
-     * Gets config fields that are invalid
-     */
-    _getConfigErrors(): string[] {
-        const errors: string[] = [];
-
-        try {
-            // should return with either config value or default
-            // default value should obviously not error or I'm dumb
-            const _ = this.getImageFormat({});
-        } catch (err) {
-            errors.push("imageFormat (string)");
-        }
-
-        if (this.interface && typeof this.interface !== "string") {
-            errors.push("interface (string)");
-        }
-
-        if (this.port && typeof this.port !== "number") {
-            errors.push("port (number)");
-        }
-
-        if (this.headless && typeof this.headless !== "boolean") {
-            errors.push("headless (boolean)");
-        }
-
-        if (this.browserArgs && typeof this.browserArgs !== "string") {
-            errors.push("browserArgs (string)");
-        }
-
-        if (this.width && typeof this.width !== "number") {
-            errors.push("width (number)");
-        }
-
-        if (this.height && typeof this.height !== "number") {
-            errors.push("height (number)");
-        }
-
-        if (this.quality && typeof this.quality !== "number") {
-            errors.push("quality (number)");
-        }
-
-        return errors;
-    }
-
-    isValid(): boolean {
-        const errs = this._getConfigErrors();
-
-        if (errs.length === 0) {
-            return true;
-        }
-
-        const errStr = errs.join("\n\t");
-        console.log(
-            `The following fields in your configuration have incorrect types:\n\t${errStr}`
-        );
-        return false;
-    }
-
-    /**
-     * Gets the option if the background browser should run headless
-     */
-    isHeadless(): boolean {
-        if (this.headless !== undefined) {
-            return this.headless;
-        }
-
-        return true;
-    }
-
-    /**
-     * Gets the chromium browser args from config
-     */
-    getBrowserArgs(): string[] {
-        if (this.browserArgs !== undefined) {
-            return this.browserArgs.split(" ");
-        }
-
-        return [];
-    }
-
-    /**
-     * Gets the HTTP server interface
-     */
-    _getInterface(): string {
-        if (this.interface !== undefined) {
-            return this.interface;
-        }
-
-        // default run on localhost, don't want to expose publicly
-        return "127.0.0.1";
-    }
-
-    /**
-     * Gets the HTTP server port
-     */
-    _getPort(): number {
-        if (this.port !== undefined) {
-            return this.port;
-        }
-
-        return 3000;
-    }
-
-    /**
-     * Gets the interface and port of the HTTP server
-     */
-    getInterfacePort() {
-        const interfacePort: Types.InterfacePort = {
-            interface: this._getInterface(),
-            port: this._getPort(),
-        };
-
-        return interfacePort;
+        this.port = parseInt(SUSHII_IMG_PORT) || 3000;
+        this.headless = SUSHII_IMG_HEADLESS
+            ? SUSHII_IMG_HEADLESS === "true"
+            : true;
+        this.browserArgs = (SUSHII_IMG_BROWSER_ARGS || "").split(" ");
+        this.width = parseInt(SUSHII_IMG_WIDTH) || 512;
+        this.height = parseInt(SUSHII_IMG_HEIGHT) || 512;
+        this.imageFormat =
+            (SUSHII_IMG_IMAGE_FORMAT as Types.ImageFormat) || "png";
+        this.quality = parseInt(SUSHII_IMG_QUALITY) || 70;
+        this.templatesDir = SUSHII_TEMPLATES_DIR || "./templates";
     }
 
     /**
