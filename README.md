@@ -14,7 +14,9 @@ run on the system and local files can be accessed.
 
 ## Table of Contents <!-- omit in toc -->
 
-- [Installation](#installation)
+- [Running](#running)
+  - [With Docker](#with-docker)
+  - [Without Docker](#without-docker)
 - [Configuration](#configuration)
 - [API Endpoints](#api-endpoints)
   - [Generate a screenshot of given url](#generate-a-screenshot-of-given-url)
@@ -26,21 +28,43 @@ run on the system and local files can be accessed.
   - [Get image server statistics](#get-image-server-statistics)
     - [Example](#example-2)
 
-## Installation
+## Running
+
+### With Docker
+
+```bash
+docker run \
+    -p 3000:3000 \
+    --init \
+    --rm \
+    --cap-add=SYS_ADMIN \
+    ghcr.io/sushiibot/sushii-image-server
+```
+
+`--cap-add=SYS_ADMIN` is needed to run Chromium in a sandbox. If you don't want
+to provide `SYS_ADMIN` to the container, you will need to launch Chromium
+without sandbox by setting `SUSHII_IMG_BROWSER_ARGS="--no-sandbox --disable-setuid-sandbox"`.
+Keep in mind that running without a sandbox is
+strongly discouraged and only should be done if you absolutely trust the content
+you open in Chromium.
+
+`--init` is used to reap zombie processes.
+
+### Without Docker
 
 1. Install [Node.js and npm](https://nodejs.org/en/download/package-manager/)
 
 2. Clone repository and enter the directory.
 
     ```bash
-    git clone https://github.com/drklee3/sushii-image-server.git
+    git clone https://github.com/sushiibot/sushii-image-server.git
     cd sushii-image-server
     ```
 
 3. Install sushii-image-server dependencies.
 
     ```bash
-    npm install
+    yarn
     ```
 
 4. Install [chromium dependencies](https://github.com/GoogleChrome/puppeteer/blob/master/docs/troubleshooting.md#chrome-headless-doesnt-launch). You can check if you are missing dependencies with `ldd chrome | grep not`.
@@ -51,41 +75,25 @@ run on the system and local files can be accessed.
     sudo apt-get install -y gconf-service libasound2 libatk1.0-0 libc6 libcairo2 libcups2 libdbus-1-3 libexpat1 libfontconfig1 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 libglib2.0-0 libgtk-3-0 libnspr4 libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 ca-certificates fonts-liberation libappindicator1 libnss3 lsb-release xdg-utils wget
     ```
 
-5. Build TypeScript files and start with `npm start` or with a process manager
+5. Build TypeScript files and start with `yarn start` or with a process manager
    like [PM2](https://github.com/Unitech/pm2).
 
 ## Configuration
 
-An example configuration can be found in [`config.json`](./config.json). These
-values are also given by default if a config file is not found or fields are
-omitted.
-Parameter values are processed in the following priority: request parameter,
-configuration, default. POST request parameters will be take priority over
-config and default values. Default values will only be used if a parameter is
-neither given in the POST request nor configuration file. For example, if the
-`width` setting in the config is set to `512` and a POST request to `/url` or
-`/html` has a paramter of `1028`, it will use `1028` for that specific request.
+Configuration options can be passed via environment variables or an `.env` file
+in the base project directory.
 
-```javascript
-{
-    "interface": "localhost",
-    "port": 3001,
+Available options with their default values are listed below:
 
-    // set to true for debugging purposes (browser will be visible)
-    "headless": false,
-    // you can use these options if you absolutely trust the content opened
-    // https://github.com/GoogleChrome/puppeteer/blob/master/docs/troubleshooting.md#setting-up-chrome-linux-sandbox
-    "browserArgs": "--no-sandbox --disable-setuid-sandbox",
-
-    // default width and height of browser viewport and screenshots
-    "width": 1280,
-    "height": 720,
-
-    // possible values: "png", "jpeg"
-    "imageFormat": "png"
-    // quality of image between 0-100, only applicable to jpeg images
-    "quality": 70
-}
+```bash
+SUSHII_IMG_INTERFACE=0.0.0.0
+SUSHII_IMG_PORT=3000
+SUSHII_IMG_HEADLESS=true
+SUSHII_IMG_BROWSER_ARGS=""
+SUSHII_IMG_WIDTH=512
+SUSHII_IMG_HEIGHT=512
+SUSHII_IMG_IMAGE_FORMAT=png
+SUSHII_IMG_QUALITY=70
 ```
 
 ## API Endpoints
