@@ -13,6 +13,8 @@ import path from "path";
 import dotenv from "dotenv";
 import client from "prom-client";
 
+const METRICS_PREFIX = "sushii_image_server_";
+
 export async function compileTemplates(
     templatesDir: string
 ): Promise<Map<string, HandlebarsTemplateDelegate>> {
@@ -38,7 +40,7 @@ export async function compileTemplates(
 
 function getMetricsRegistry(): client.Registry {
     const register = new client.Registry();
-    client.collectDefaultMetrics({ register, prefix: "sushii_image_server_" });
+    client.collectDefaultMetrics({ register, prefix: METRICS_PREFIX });
 
     return register;
 }
@@ -65,17 +67,18 @@ export async function getApp(config: Config): Promise<Koa> {
         args: config.browserArgs,
     });
 
-    app.context.metrics = {};
-    app.context.metrics.register = getMetricsRegistry();
-    app.context.metrics.requests = new client.Counter({
-        name: "http_requests_total",
+    const register = getMetricsRegistry();
+    const requestsCounter = new client.Counter({
+        name: `${METRICS_PREFIX}http_requests_total`,
         help: "total HTTP requests",
         labelNames: ["endpoint", "method", "status"],
-        registers: [app.context.metrics.register],
+        registers: [register],
     });
 
+    register.registerMetric(requestsCounter);
+
     router.get("/metrics", async (ctx: Koa.Context) => {
-        ctx.body = await ctx.metrics.register.metrics();
+        ctx.body = await register.metrics();
     });
 
     router.post("/url", async (ctx: Koa.Context) => {
@@ -175,8 +178,7 @@ export async function getApp(config: Config): Promise<Koa> {
             await next();
 
             // After response created
-            const counter = ctx.metrics.requests;
-            counter.inc({
+            requestsCounter.inc({
                 method: ctx.method,
                 status: ctx.status,
                 endpoint: ctx.path,
