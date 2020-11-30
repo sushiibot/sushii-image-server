@@ -4,8 +4,7 @@ import Router from "@koa/router";
 import bodyParser from "koa-bodyparser";
 import puppeteer from "puppeteer";
 import logger from "koa-logger";
-import { Stats, ScreenshotOptions } from "./types";
-import pkg from "../package.json";
+import { ScreenshotOptions } from "./types";
 import Config from "./config";
 import Handlebars from "handlebars";
 import fs from "fs";
@@ -191,7 +190,7 @@ export async function getApp(config: Config): Promise<Koa> {
     return app;
 }
 
-export async function main() {
+export async function main(): Promise<void> {
     dotenv.config();
     const config = new Config();
 
