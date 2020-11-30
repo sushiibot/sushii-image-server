@@ -22,8 +22,8 @@ describe("HTTP", () => {
         app.context.browser.close();
     });
 
-    it("should handle /", async () => {
-        const res = await r.get("/");
+    it("should handle /metrics", async () => {
+        const res = await r.get("/metrics");
 
         expect(res.status).toBe(200);
     });
