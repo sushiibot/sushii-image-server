@@ -48,6 +48,10 @@ export async function getApp(config: Config): Promise<Koa> {
         }
     );
 
+    if (config.browserArgs.length > 0) {
+        console.log("Using browser args:", config.browserArgs);
+    }
+
     // Add browser to context
     app.context.browser = await puppeteer.launch({
         headless: config.headless,

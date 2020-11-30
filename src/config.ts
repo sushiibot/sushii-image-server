@@ -1,7 +1,5 @@
 import * as Types from "./types";
 
-function env() {}
-
 export default class Config {
     interface?: string;
     port: number;
@@ -50,7 +48,7 @@ export default class Config {
      * @param body HTTP request body
      */
     _getImageFormat(body: Types.Body): string {
-        let { imageFormat } = body;
+        const { imageFormat } = body;
         // post body type
         if (imageFormat !== undefined) {
             return imageFormat;
@@ -136,9 +134,9 @@ export default class Config {
      * @returns    Image / viewport dimensions
      */
     getDimensions(body: Types.Body): Types.Dimensions {
-        let { width, height } = body;
+        const { width, height } = body;
 
-        let dimensions: Types.Dimensions = {
+        const dimensions: Types.Dimensions = {
             width: this._getDimension(width, "width"),
             height: this._getDimension(height, "height"),
         };
@@ -152,7 +150,7 @@ export default class Config {
      * @returns    Quality value
      */
     getQuality(body: Types.Body): number {
-        let { quality } = body;
+        const { quality } = body;
 
         if (quality !== undefined) {
             return parseInt(quality);

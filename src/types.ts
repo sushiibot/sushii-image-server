@@ -28,7 +28,7 @@ export interface Body {
 }
 
 export interface TemplateBodyContext extends Body {
-    context?: any;
+    context?: { [key: string]: string };
 }
 
 export interface TemplateBodyName extends TemplateBodyContext {
