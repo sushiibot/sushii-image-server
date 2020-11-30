@@ -6,7 +6,7 @@
     "scripts": {
         "build": "tsc",
         "test": "jest",
-        "start": "yarn run build && node dist/src/index.js",
+        "start": "yarn run build && node dist/index.js",
         "lint": "yarn eslint . --ext .js,.ts"
     },
     "author": "Derrick Lee <derrick@dlee.dev>",
