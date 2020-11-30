@@ -129,7 +129,7 @@ SUSHII_IMG_QUALITY=70
       -d imageFormat=png > image.png
   ```
 
-* `POST / template`
+* `POST /template`
   Generate a screenshot of Handlebars template. One of `templateHtml` or
   `templateName` is required.
 
