@@ -12,6 +12,7 @@ import fs from "fs";
 import util from "util";
 import path from "path";
 import dotenv from "dotenv";
+import client from "prom-client";
 
 export async function compileTemplates(
     templatesDir: string
@@ -36,6 +37,13 @@ export async function compileTemplates(
     return templates;
 }
 
+function getMetricsRegistry(): client.Registry {
+    const register = new client.Registry();
+    client.collectDefaultMetrics({ register, prefix: "sushii_image_server_" });
+
+    return register;
+}
+
 export async function getApp(config: Config): Promise<Koa> {
     const app = new Koa();
     const router = new Router();
@@ -58,17 +66,17 @@ export async function getApp(config: Config): Promise<Koa> {
         args: config.browserArgs,
     });
 
-    let urlCount = 0;
-    let htmlCount = 0;
+    app.context.metrics = {};
+    app.context.metrics.register = getMetricsRegistry();
+    app.context.metrics.requests = new client.Counter({
+        name: "http_requests_total",
+        help: "total HTTP requests",
+        labelNames: ["endpoint", "method", "status"],
+        registers: [app.context.metrics.register],
+    });
 
-    router.get("/", (ctx) => {
-        const stats: Stats = {
-            version: pkg.version,
-            urlCount,
-            htmlCount,
-            totalCount: urlCount + htmlCount,
-        };
-        ctx.body = stats;
+    router.get("/metrics", async (ctx: Koa.Context) => {
+        ctx.body = await ctx.metrics.register.metrics();
     });
 
     router.post("/url", async (ctx: Koa.Context) => {
@@ -164,6 +172,17 @@ export async function getApp(config: Config): Promise<Koa> {
     });
 
     app.use(logger())
+        .use(async (ctx, next) => {
+            await next();
+
+            // After response created
+            const counter = ctx.metrics.requests;
+            counter.inc({
+                method: ctx.method,
+                status: ctx.status,
+                endpoint: ctx.path,
+            });
+        })
         .use(serve("./files"))
         .use(bodyParser())
         .use(router.routes())
