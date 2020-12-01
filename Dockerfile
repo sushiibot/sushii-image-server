@@ -11,16 +11,10 @@ RUN apt-get update && \
     libxtst6 ca-certificates fonts-liberation libappindicator1 libnss3 lsb-release xdg-utils wget && \
     rm -rf /var/lib/apt/lists/*
 
-# Add user so we don't need --no-sandbox.
-RUN groupadd -r pptruser && useradd -r -g pptruser -G audio,video pptruser \
-    && mkdir -p /home/pptruser/Downloads \
-    && chown -R pptruser:pptruser /home/pptruser
-
 # Run everything after as non-privileged user.
-USER pptruser
 
 # Create workdir
-WORKDIR /home/pptruser
+WORKDIR /app
 
 # Copy and install dependencies
 COPY package.json yarn.lock ./
@@ -29,6 +23,10 @@ RUN yarn install --frozen-lockfile
 # Copy and build source files
 COPY . .
 RUN yarn build
+
+# Add user so we don't need --no-sandbox.
+RUN groupadd -r sushii && useradd -r -g sushii -G audio,video sushii
+USER sushii
 
 EXPOSE 3000
 CMD [ "node", "dist/index.js" ]
