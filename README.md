@@ -4,8 +4,9 @@
 
 Simple local web server made with [Koa](https://github.com/koajs/koa) and
 [puppeteer](https://github.com/GoogleChrome/puppeteer) to generate images for
-[sushii-bot](https://github.com/drklee3/sushii-bot). The files directory can be
-used to serve static files used for HTML screenshots (e.g., JavaScript files).
+[sushii-bot](https://github.com/drklee3/sushii-bot). The `static` directory can
+be used to serve static files used for HTML screenshots (e.g., JavaScript, css,
+image files).
 
 ## ⚠ Warning <!-- omit in toc -->
 
@@ -41,6 +42,25 @@ strongly discouraged and only should be done if you absolutely trust the content
 you open in Chromium.
 
 `--init` is used to reap zombie processes.
+
+Example docker-compose.yml configuration:
+
+```yml
+version: "3.8"
+services:
+    sushii-image-server:
+        image: ghcr.io/sushiibot/sushii-image-server:latest
+        container_name: sushii-image-server
+        restart: unless-stopped
+        init: true
+        cap_add:
+            - SYS_ADMIN
+        expose:
+            - "3000"
+        # If you want to add static files
+        volumes:
+            - /some/path/static:/app/static:ro
+```
 
 ### Without Docker
 
