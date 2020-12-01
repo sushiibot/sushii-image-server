@@ -58,7 +58,7 @@ typings/
 .env
 
 # static files directory
-files/*
-!files/.gitkeep
+static/*
+!static/.gitkeep
 
 dist/

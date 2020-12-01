@@ -184,7 +184,7 @@ export async function getApp(config: Config): Promise<Koa> {
                 endpoint: ctx.path,
             });
         })
-        .use(serve("./files"))
+        .use(serve("./static"))
         .use(bodyParser())
         .use(router.routes())
         .use(router.allowedMethods());
