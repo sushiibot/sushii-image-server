@@ -61,4 +61,7 @@ typings/
 static/*
 !static/.gitkeep
 
+templates/*
+!templates/test.hbs
+
 dist/
