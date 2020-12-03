@@ -57,9 +57,11 @@ services:
             - SYS_ADMIN
         expose:
             - "3000"
-        # If you want to add static files
         volumes:
+            # Static files
             - /some/path/static:/app/static:ro
+            # Handlebar template files
+            - /some/path/templates:/app/templates:ro
 ```
 
 ### Without Docker

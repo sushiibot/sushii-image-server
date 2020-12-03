@@ -1,4 +1,5 @@
 import Koa from "koa";
+import mount from "koa-mount";
 import serve from "koa-static";
 import Router from "@koa/router";
 import bodyParser from "koa-bodyparser";
@@ -184,7 +185,7 @@ export async function getApp(config: Config): Promise<Koa> {
                 endpoint: ctx.path,
             });
         })
-        .use(serve("./static"))
+        .use(mount("/static", serve("./static")))
         .use(bodyParser())
         .use(router.routes())
         .use(router.allowedMethods());
