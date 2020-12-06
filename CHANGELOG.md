@@ -5,7 +5,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [unreleased]
+## [Unreleased]
+
+## [5.1.0]
 
 ### Added
 
@@ -14,6 +16,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 -  Rename `files` directory to `static`
+-  Move Docker image workdir to /app
+
+### Fixed
+
+-  Mount static files on `/static` path
 
 ## [5.0.0]
 
@@ -28,5 +35,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 -  Switch to Yarn from npm
 -  Use environment variables for configuration instead of json config file
 
-[unreleased]: https://github.com/sushiibot/sushii-image-server/compare/v5.0.0...HEAD
+[unreleased]: https://github.com/sushiibot/sushii-image-server/compare/v5.1.0...HEAD
+[5.1.0]: https://github.com/sushiibot/sushii-image-server/compare/v5.0.0...v5.0.1
 [5.0.0]: https://github.com/sushiibot/sushii-image-server/compare/v4.0.0...v5.0.0
