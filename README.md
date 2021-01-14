@@ -20,6 +20,7 @@ run on the system and local files can be accessed.
   - [Without Docker](#without-docker)
 - [Configuration](#configuration)
 - [API Endpoints](#api-endpoints)
+- [Projects using sushii-image-server](#projects-using-sushii-image-server)
 
 ## Running
 
@@ -90,7 +91,7 @@ services:
     ```
 
 5. Build TypeScript files and start with `yarn start` or with a process manager
-   like [PM2](https://github.com/Unitech/pm2).
+   like [PM2].
 
 ## Configuration
 
@@ -113,6 +114,7 @@ SUSHII_IMG_QUALITY=70
 ## API Endpoints
 
 * `POST /url`
+
   Generate a screenshot of given url
 
   | Parameter   | Description                                | Default Value |
@@ -133,6 +135,7 @@ SUSHII_IMG_QUALITY=70
   ```
 
 * `POST /html`
+
   Generate a screenshot of given HTML
 
   | key         | Description                                 | Default Value |
@@ -152,6 +155,7 @@ SUSHII_IMG_QUALITY=70
   ```
 
 * `POST /template`
+
   Generate a screenshot of Handlebars template. One of `templateHtml` or
   `templateName` is required.
 
@@ -180,10 +184,20 @@ SUSHII_IMG_QUALITY=70
       -d imageFormat=png > image.png
   ```
 
-* `GET /`
-  Get image server statistics
+* `GET /metrics`
 
-  ```bash
-  $ curl localhost:3000
-  {"version":"3.0.0","urlCount":3,"htmlCount":3,"totalCount":6}
-  ```
+  Get image server prometheus metrics. Uses [prom-client] which includes process
+  metrics in addition to sushii image metrics. API request metrics are under
+  `sushii_image_server_http_requests_total` with the labels `endpoint`,
+  `method`, `status`.
+
+## Projects using sushii-image-server
+
+* [sushii bot]
+* [haseul bot]
+* Use sushii-image-server? Feel free to open a PR to add to the list!
+
+[PM2]: https://github.com/Unitech/pm2
+[prom-client]: https://github.com/siimon/prom-client
+[sushii bot]: https://github.com/sushiibot/sushii-2
+[haseul bot]: https://github.com/twoscott/haseul-bot
