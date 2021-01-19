@@ -10,8 +10,9 @@ image files).
 
 ## ⚠ Warning <!-- omit in toc -->
 
-Don't serve this publicly unless you know the risks. Any JavaScript code can be
-run on the system and local files can be accessed.
+This is intended for requests from **trusted** services and is not designed for
+direct public access. Any JavaScript code can be run on the system and local
+files can be accessed.
 
 ## Table of Contents <!-- omit in toc -->
 
