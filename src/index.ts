@@ -119,7 +119,10 @@ export async function getApp(config: Config): Promise<Koa> {
         const htmlBase64 = buff.toString("base64");
 
         await page.setViewport({ width, height });
-        await page.goto(`data:text/html;charset=utf-8;base64,${htmlBase64}`);
+        // 5 Second timeout, default is 30 seconds which is too long
+        await page.goto(`data:text/html;charset=utf-8;base64,${htmlBase64}`, {
+            timeout: 5000,
+        });
 
         const imageFormat = config.getImageFormat(body);
         const screenshotOptions: ScreenshotOptions = {
