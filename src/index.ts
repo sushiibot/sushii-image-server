@@ -134,7 +134,15 @@ export async function getApp(config: Config): Promise<Koa> {
             screenshotOptions.quality = config.getQuality(body);
         }
 
-        ctx.body = await page.screenshot(screenshotOptions);
+        // 10s screenshot timeout
+        ctx.body = await Promise.race([
+            page.screenshot(screenshotOptions),
+            new Promise((_, reject) =>
+                setTimeout(function () {
+                    reject("Screenshot timeout");
+                }, 10000)
+            ),
+        ]);
         ctx.type = config.getResponseType(body);
 
         page.close();
