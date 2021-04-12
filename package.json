@@ -1,6 +1,6 @@
 {
     "name": "sushii-image-server",
-    "version": "5.2.1",
+    "version": "5.2.2",
     "description": "Simple local web server made with Koa and puppeteer to generate images.",
     "main": "dist/index.js",
     "scripts": {
@@ -25,7 +25,7 @@
         "koa-mount": "^4.0.0",
         "koa-static": "^5.0.0",
         "prom-client": "^12.0.0",
-        "puppeteer": "^5.5"
+        "puppeteer": "^8.0"
     },
     "devDependencies": {
         "@types/jest": "^26.0.15",
@@ -36,7 +36,6 @@
         "@types/koa-static": "^4.0.1",
         "@types/koa__router": "^8.0.3",
         "@types/node": "^14.14.6",
-        "@types/puppeteer": "^3.0.4",
         "@types/supertest": "^2.0.10",
         "@typescript-eslint/eslint-plugin": "^4.8.2",
         "@typescript-eslint/parser": "^4.8.2",
