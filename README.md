@@ -158,7 +158,8 @@ SUSHII_IMG_QUALITY=70
 * `POST /template`
 
   Generate a screenshot of Handlebars template. One of `templateHtml` or
-  `templateName` is required.
+  `templateName` is required. Template data should be passed as JSON in the
+  request body.
 
   | Key          | Description                                  | Default Value |
   | :----------- | :------------------------------------------- | ------------- |
@@ -168,18 +169,19 @@ SUSHII_IMG_QUALITY=70
   | height       | Screenshot height                            | 512           |
   | imageFormat  | Image format (png or jpeg)                   | png           |
   | quality      | Jpeg image quality (0-100)                   | 70            |
+  | context      | JSON context for Handlebars replacement      |               |
 
   ```bash
   curl localhost:3000/template \
       -d templateName=test \
-      -d '{"name": "Bob" }' \
+      -d context='{"name": "Bob" }' \
       -d width=1280 \
       -d height=720 \
       -d imageFormat=png > image.png
 
   curl localhost:3000/template \
       -d templateHtml="<p>Hello, {{name}}</p>" \
-      -d '{"name": "Bob" }' \
+      -d context='{"name": "Bob" }' \
       -d width=1280 \
       -d height=720 \
       -d imageFormat=png > image.png
