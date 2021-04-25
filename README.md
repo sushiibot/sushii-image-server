@@ -199,6 +199,7 @@ SUSHII_IMG_QUALITY=70
 * [sushii bot]
 * [haseul bot]
 * [hyejoo bot]
+* hyejoo bot
 * Use sushii-image-server? Feel free to open a PR to add to the list!
 
 [PM2]: https://github.com/Unitech/pm2
