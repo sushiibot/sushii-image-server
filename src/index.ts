@@ -119,33 +119,35 @@ export async function getApp(config: Config): Promise<Koa> {
         const htmlBase64 = buff.toString("base64");
 
         await page.setViewport({ width, height });
-        // 5 Second timeout, default is 30 seconds which is too long
-        await page.goto(`data:text/html;charset=utf-8;base64,${htmlBase64}`, {
-            timeout: 5000,
-        });
+        try {
+            // 5 Second timeout, default is 30 seconds which is too long
+            await page.goto(`data:text/html;charset=utf-8;base64,${htmlBase64}`, {
+                timeout: 5000,
+            });
 
-        const imageFormat = config.getImageFormat(body);
-        const screenshotOptions: ScreenshotOptions = {
-            omitBackground: true,
-            type: imageFormat,
-        };
+            const imageFormat = config.getImageFormat(body);
+            const screenshotOptions: ScreenshotOptions = {
+                omitBackground: true,
+                type: imageFormat,
+            };
 
-        if (imageFormat == "jpeg") {
-            screenshotOptions.quality = config.getQuality(body);
+            if (imageFormat == "jpeg") {
+                screenshotOptions.quality = config.getQuality(body);
+            }
+
+            // 10s screenshot timeout
+            ctx.body = await Promise.race([
+                page.screenshot(screenshotOptions),
+                new Promise((_, reject) =>
+                    setTimeout(function () {
+                        reject("Screenshot timeout");
+                    }, 10000)
+                ),
+            ]);
+            ctx.type = config.getResponseType(body);
+        } finally {
+            page.close();
         }
-
-        // 10s screenshot timeout
-        ctx.body = await Promise.race([
-            page.screenshot(screenshotOptions),
-            new Promise((_, reject) =>
-                setTimeout(function () {
-                    reject("Screenshot timeout");
-                }, 10000)
-            ),
-        ]);
-        ctx.type = config.getResponseType(body);
-
-        page.close();
     }
 
     router.post("/html", async (ctx: Koa.Context) => {
