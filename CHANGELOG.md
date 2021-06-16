@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [unreleased]
 
+## [5.2.3] - 2021-06-16
+
+### Fixed
+
+-  Fix memory / PID leak when page navigation is timed out ([@joinemm])
+
+## [5.2.2] - 2021-04-11
+
+### Changed
+
+-  Lower page.goto and page.screenshot timeouts to 5s and 10s respectively
+
+## [5.2.1] - 2021-02-24
+
 ### Changed
 
 -  Updated Docker node version to node:15-buster
@@ -53,3 +67,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [5.2.0]: https://github.com/sushiibot/sushii-image-server/compare/v5.1.0...v5.2.0
 [5.1.0]: https://github.com/sushiibot/sushii-image-server/compare/v5.0.0...v5.1.0
 [5.0.0]: https://github.com/sushiibot/sushii-image-server/compare/v4.0.0...v5.0.0
+
+[@joinemm]: https://github.com/joinemm
