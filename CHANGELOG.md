@@ -64,6 +64,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 -  Use environment variables for configuration instead of json config file
 
 [unreleased]: https://github.com/sushiibot/sushii-image-server/compare/v5.2.0...HEAD
+[5.2.3]: https://github.com/sushiibot/sushii-image-server/compare/v5.1.2...v5.2.3
+[5.2.2]: https://github.com/sushiibot/sushii-image-server/compare/v5.1.1...v5.2.2
+[5.2.1]: https://github.com/sushiibot/sushii-image-server/compare/v5.2.0...v5.2.1
 [5.2.0]: https://github.com/sushiibot/sushii-image-server/compare/v5.1.0...v5.2.0
 [5.1.0]: https://github.com/sushiibot/sushii-image-server/compare/v5.0.0...v5.1.0
 [5.0.0]: https://github.com/sushiibot/sushii-image-server/compare/v4.0.0...v5.0.0
