@@ -200,6 +200,7 @@ SUSHII_IMG_QUALITY=70
 * [haseul bot]
 * [hyejoo bot]
 * [miso bot]
+* [bento bot]
 * Use sushii-image-server? Feel free to open a PR to add to the list!
 
 [PM2]: https://github.com/Unitech/pm2
@@ -208,3 +209,4 @@ SUSHII_IMG_QUALITY=70
 [sushii bot]: https://github.com/sushiibot/sushii-2
 [haseul bot]: https://github.com/twoscott/haseul-bot
 [miso bot]: https://github.com/joinemm/miso-bot
+[bento bot]: https://github.com/thebentobot/bentoTS
