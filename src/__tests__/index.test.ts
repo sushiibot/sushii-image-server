@@ -1,4 +1,4 @@
-import { compileTemplates, getApp } from "../index";
+import { compileTemplates, Context, getApp } from "../index";
 import Koa from "koa";
 import request, { SuperTest, Test } from "supertest";
 import Config from "../config";
@@ -10,7 +10,7 @@ test("templates compile successfully", async () => {
 });
 
 describe("HTTP", () => {
-    let app: Koa;
+    let app: Koa<Koa.DefaultState, Context>;
     let r: SuperTest<Test>;
 
     beforeAll(async () => {
@@ -19,7 +19,7 @@ describe("HTTP", () => {
     });
 
     afterAll(async () => {
-        app.context.browser.close();
+        await app.context.browser.close();
     });
 
     it("should handle /metrics", async () => {
