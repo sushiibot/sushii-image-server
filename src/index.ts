@@ -46,8 +46,13 @@ function getMetricsRegistry(): client.Registry {
     return register;
 }
 
-export async function getApp(config: Config): Promise<Koa> {
-    const app = new Koa();
+export interface Context {
+    browser: puppeteer.Browser;
+    templates: Map<string, HandlebarsTemplateDelegate>
+}
+
+export async function getApp(config: Config): Promise<Koa<Koa.DefaultState, Context>> {
+    const app = new Koa<Koa.DefaultState, Context>();
     const router = new Router();
 
     // Add templates to context
@@ -62,7 +67,6 @@ export async function getApp(config: Config): Promise<Koa> {
         console.log("Using browser args:", config.browserArgs);
     }
 
-    // Add browser to context
     app.context.browser = await puppeteer.launch({
         headless: config.headless,
         args: config.browserArgs,
@@ -83,7 +87,7 @@ export async function getApp(config: Config): Promise<Koa> {
     });
 
     router.post("/url", async (ctx: Koa.Context) => {
-        const page = await ctx.browser.newPage();
+        const page = await app.context.browser.newPage();
         const body = ctx.request.body;
         const { url } = body;
 
@@ -104,24 +108,21 @@ export async function getApp(config: Config): Promise<Koa> {
 
         ctx.body = await page.screenshot(screenshotOptions);
         ctx.type = config.getResponseType(body);
+        ctx.res.end()
 
-        page.close();
+        await page.close();
     });
 
     async function renderHtml(ctx: Koa.Context, html: string) {
-        const page = await ctx.browser.newPage();
+        const page = await app.context.browser.newPage();
         const body = ctx.request.body;
 
         const { width, height } = config.getDimensions(body);
 
-        // Encode HTML string in base64
-        const buff = Buffer.from(html, "utf-8");
-        const htmlBase64 = buff.toString("base64");
-
         await page.setViewport({ width, height });
         try {
             // 5 Second timeout, default is 30 seconds which is too long
-            await page.goto(`data:text/html;charset=utf-8;base64,${htmlBase64}`, {
+            await page.setContent(html, {
                 timeout: 5000,
             });
 
@@ -146,7 +147,8 @@ export async function getApp(config: Config): Promise<Koa> {
             ]);
             ctx.type = config.getResponseType(body);
         } finally {
-            page.close();
+            ctx.res.end();
+            await page.close();
         }
     }
 
