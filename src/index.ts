@@ -155,6 +155,13 @@ export async function getApp(
   }
 
   router.post("/html", async (ctx: Koa.Context) => {
+    if (typeof ctx.request.body.html !== "string") {
+      ctx.status = 400;
+      ctx.body = "Invalid body html";
+
+      return;
+    }
+
     await renderHtml(ctx, ctx.request.body.html);
   });
 
