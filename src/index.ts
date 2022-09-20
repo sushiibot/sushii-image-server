@@ -115,31 +115,49 @@ export async function getApp(config: Config): Promise<Express> {
   });
 
   app.post("/url", async (req: Request, res: Response) => {
-    const page = await browser.newPage();
-    const {
-      body,
-      body: { url },
-    } = req;
+    let page: Page;
 
-    const { width, height } = config.getDimensions(body);
+    try {
+      page = await timeout(browser.newPage(), 2000);
+      const {
+        body,
+        body: { url },
+      } = req;
 
-    await page.setViewport({ width, height });
-    await page.goto(url);
+      const { width, height } = config.getDimensions(body);
 
-    const imageFormat = config.getImageFormat(body);
-    const screenshotOptions: puppeteer.ScreenshotOptions = {
-      omitBackground: true,
-      type: imageFormat,
-    };
+      await page.setViewport({ width, height });
+      await page.goto(url);
 
-    if (imageFormat == "jpeg") {
-      screenshotOptions.quality = config.getQuality(body);
+      const imageFormat = config.getImageFormat(body);
+      const screenshotOptions: puppeteer.ScreenshotOptions = {
+        omitBackground: true,
+        type: imageFormat,
+      };
+
+      if (imageFormat == "jpeg") {
+        screenshotOptions.quality = config.getQuality(body);
+      }
+
+      const screenshot = await timeout(
+        page.screenshot(screenshotOptions),
+        10000,
+        "screenshot timed out"
+      );
+
+      res.set("Content-Type", config.getResponseType(body));
+      res.send(screenshot);
+    } catch (err) {
+      logger.error(err, "Error rendering url: ");
+      res.status(500).send("Error rendering url");
+    } finally {
+      res.end();
+
+      if (page && !page.isClosed()) {
+        logger.debug("closing page");
+        await page.close();
+      }
     }
-
-    res.set("Content-Type", config.getResponseType(body));
-    res.send(await page.screenshot(screenshotOptions));
-
-    await page.close();
   });
 
   async function renderHtml(req: Request, res: Response, html: string) {
