@@ -90,7 +90,6 @@ export async function getApp(config: Config): Promise<Express> {
     // False to prevent overriding terminus shutdown
     // https://github.com/godaddy/terminus/issues/103
     handleSIGINT: false,
-    dumpio: true,
   });
 
   app.set("browser", browser);
