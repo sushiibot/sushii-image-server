@@ -184,7 +184,7 @@ export async function getApp(config: Config): Promise<Express> {
     } finally {
       res.end();
 
-      if (page) {
+      if (page && !page.isClosed()) {
         logger.debug("closing page");
         await page.close();
       }
