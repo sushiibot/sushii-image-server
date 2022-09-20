@@ -154,7 +154,12 @@ export async function getApp(config: Config): Promise<Express> {
 
       if (page && !page.isClosed()) {
         logger.debug("closing page");
-        await page.close();
+
+        try {
+          await page.close();
+        } catch (err) {
+          logger.warn(err, "Error closing page");
+        }
       }
     }
   });
