@@ -1,37 +1,31 @@
-export interface ScreenshotOptions {
-    omitBackground: boolean;
-    type: "jpeg" | "png";
-    quality?: number;
-}
-
 export interface Body {
-    url?: string;
-    html?: string;
+  url?: string;
+  html?: string;
 
-    width?: string;
-    height?: string;
+  width?: string;
+  height?: string;
 
-    imageFormat?: string;
-    quality?: string;
+  imageFormat?: string;
+  quality?: string;
 }
 
 export interface TemplateBodyContext extends Body {
-    context?: { [key: string]: string };
+  context?: { [key: string]: string };
 }
 
 export interface TemplateBodyName extends TemplateBodyContext {
-    templateName: string;
+  templateName: string;
 }
 
 export interface TemplateBodyHtml extends TemplateBodyContext {
-    templateHtml: string;
+  templateHtml: string;
 }
 
 export type TemplateBody = TemplateBodyName | TemplateBodyHtml;
 
 export interface Dimensions {
-    width: number;
-    height: number;
+  width: number;
+  height: number;
 }
 
 export type Dimension = "width" | "height";
