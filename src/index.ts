@@ -1,11 +1,4 @@
-import Koa from "koa";
-import mount from "koa-mount";
-import serve from "koa-static";
-import Router from "@koa/router";
-import bodyParser from "koa-bodyparser";
-import puppeteer from "puppeteer";
-import logger from "koa-logger";
-import { ScreenshotOptions } from "./types";
+import puppeteer, { Page } from "puppeteer";
 import Config from "./config";
 import Handlebars from "handlebars";
 import fs from "fs";
@@ -13,6 +6,15 @@ import util from "util";
 import path from "path";
 import dotenv from "dotenv";
 import client from "prom-client";
+import express, { Request, Response, Express } from "express";
+import pino from "pino";
+import pinoHttp from "pino-http";
+import http from "http";
+import { createTerminus, TerminusState } from "@godaddy/terminus";
+
+const logger = pino({
+  level: process.env.LOG_LEVEL || "info",
+});
 
 const METRICS_PREFIX = "sushii_image_server_";
 
@@ -46,33 +48,52 @@ function getMetricsRegistry(): client.Registry {
   return register;
 }
 
+function timeout<T>(
+  prom: Promise<T>,
+  ms: number,
+  errMessage?: string
+): Promise<T> {
+  return Promise.race([
+    prom,
+    new Promise<T>((_, reject) =>
+      setTimeout(() => reject(`method call timed out: ${errMessage}`), ms)
+    ),
+  ]);
+}
+
 export interface Context {
   browser: puppeteer.Browser;
   templates: Map<string, HandlebarsTemplateDelegate>;
 }
 
-export async function getApp(
-  config: Config
-): Promise<Koa<Koa.DefaultState, Context>> {
-  const app = new Koa<Koa.DefaultState, Context>();
-  const router = new Router<Koa.DefaultState, Context>();
+export async function getApp(config: Config): Promise<Express> {
+  const app = express();
+
+  // body parser
+  app.use(pinoHttp());
+  app.use(express.json());
+  app.use(express.urlencoded({ extended: false }));
 
   // Add templates to context
-  app.context.templates = await compileTemplates(config.templatesDir).catch(
-    (e) => {
-      console.log("Error compiling templates: ", e);
-      process.exit(1);
-    }
-  );
+  const templates = await compileTemplates(config.templatesDir).catch((e) => {
+    logger.error("Error compiling templates: ", e);
+    process.exit(1);
+  });
 
   if (config.browserArgs.length > 0) {
-    console.log("Using browser args:", config.browserArgs);
+    logger.info(config.browserArgs, "Using browser args");
   }
 
-  app.context.browser = await puppeteer.launch({
+  const browser = await puppeteer.launch({
     headless: config.headless,
     args: config.browserArgs,
+    // False to prevent overriding terminus shutdown
+    // https://github.com/godaddy/terminus/issues/103
+    handleSIGINT: false,
+    dumpio: true,
   });
+
+  app.set("browser", browser);
 
   const register = getMetricsRegistry();
   const requestsCounter = new client.Counter({
@@ -84,14 +105,21 @@ export async function getApp(
 
   register.registerMetric(requestsCounter);
 
-  router.get("/metrics", async (ctx: Koa.Context) => {
-    ctx.body = await register.metrics();
+  app.get("/metrics", async (req: Request, res: Response) => {
+    try {
+      res.set("Content-Type", register.contentType);
+      res.end(await register.metrics());
+    } catch (ex) {
+      res.status(500).end(ex);
+    }
   });
 
-  router.post("/url", async (ctx: Koa.Context) => {
-    const page = await ctx.browser.newPage();
-    const body = ctx.request.body;
-    const { url } = body;
+  app.post("/url", async (req: Request, res: Response) => {
+    const page = await browser.newPage();
+    const {
+      body,
+      body: { url },
+    } = req;
 
     const { width, height } = config.getDimensions(body);
 
@@ -99,7 +127,7 @@ export async function getApp(
     await page.goto(url);
 
     const imageFormat = config.getImageFormat(body);
-    const screenshotOptions: ScreenshotOptions = {
+    const screenshotOptions: puppeteer.ScreenshotOptions = {
       omitBackground: true,
       type: imageFormat,
     };
@@ -108,28 +136,31 @@ export async function getApp(
       screenshotOptions.quality = config.getQuality(body);
     }
 
-    ctx.body = await page.screenshot(screenshotOptions);
-    ctx.type = config.getResponseType(body);
-    ctx.res.end();
+    res.set("Content-Type", config.getResponseType(body));
+    res.send(await page.screenshot(screenshotOptions));
 
     await page.close();
   });
 
-  async function renderHtml(ctx: Koa.Context, html: string) {
-    const page = await ctx.browser.newPage();
-    const body = ctx.request.body;
+  async function renderHtml(req: Request, res: Response, html: string) {
+    let page: Page;
 
-    const { width, height } = config.getDimensions(body);
-
-    await page.setViewport({ width, height });
     try {
+      logger.debug("opening new browser page");
+      page = await timeout(browser.newPage(), 2000);
+
+      logger.debug("setting viewport");
+      const { body } = req;
+      const { width, height } = config.getDimensions(body);
+      await page.setViewport({ width, height });
+
       // 5 Second timeout, default is 30 seconds which is too long
       await page.setContent(html, {
         timeout: 5000,
       });
 
       const imageFormat = config.getImageFormat(body);
-      const screenshotOptions: ScreenshotOptions = {
+      const screenshotOptions: puppeteer.ScreenshotOptions = {
         omitBackground: true,
         type: imageFormat,
       };
@@ -139,35 +170,40 @@ export async function getApp(
       }
 
       // 10s screenshot timeout
-      ctx.body = await Promise.race([
+      const screenshot = await timeout(
         page.screenshot(screenshotOptions),
-        new Promise((_, reject) =>
-          setTimeout(function () {
-            reject("Screenshot timeout");
-          }, 10000)
-        ),
-      ]);
-      ctx.type = config.getResponseType(body);
+        10000,
+        "screenshot timed out"
+      );
+
+      res.set("Content-Type", config.getResponseType(body));
+      res.send(screenshot);
+    } catch (err) {
+      logger.error(err, "Error rendering html: ");
+      res.status(500).send("Error rendering html");
     } finally {
-      ctx.res.end();
-      await page.close();
+      res.end();
+
+      if (page) {
+        logger.debug("closing page");
+        await page.close();
+      }
     }
   }
 
-  router.post("/html", async (ctx: Koa.Context) => {
-    if (typeof ctx.request.body.html !== "string") {
-      ctx.status = 400;
-      ctx.body = "Invalid body html";
+  app.post("/html", async (req: Request, res: Response) => {
+    if (!req.body.html) {
+      res.status(400).send("Invalid body html");
 
       return;
     }
 
-    await renderHtml(ctx, ctx.request.body.html);
+    await renderHtml(req, res, req.body.html);
   });
 
-  router.post("/template", async (ctx: Koa.Context) => {
-    const { templateName, templateHtml } = ctx.request.body;
-    let { context } = ctx.request.body;
+  app.post("/template", async (req: Request, res: Response) => {
+    const { templateName, templateHtml } = req.body;
+    let { context } = req.body;
 
     if (!templateName && !templateHtml) {
       throw Error("Missing templateName or templateHtml");
@@ -177,7 +213,7 @@ export async function getApp(
 
     // Name of template
     if (templateName) {
-      template = ctx.templates.get(templateName);
+      template = templates.get(templateName);
 
       if (!template) {
         throw Error(`No template named ${templateName} found`);
@@ -194,26 +230,21 @@ export async function getApp(
     }
 
     const html = template(context);
-
-    await renderHtml(ctx, html);
+    await renderHtml(req, res, html);
   });
 
   app
-    .use(logger())
-    .use(async (ctx, next) => {
-      await next();
+    .use(async (req, res, next) => {
+      next();
 
       // After response created
       requestsCounter.inc({
-        method: ctx.method,
-        status: ctx.status,
-        endpoint: ctx.path,
+        method: req.method,
+        status: res.statusCode,
+        endpoint: req.path,
       });
     })
-    .use(mount("/static", serve("./static")))
-    .use(bodyParser())
-    .use(router.routes())
-    .use(router.allowedMethods());
+    .use(express.static("./static"));
 
   return app;
 }
@@ -223,11 +254,34 @@ export async function main(): Promise<void> {
   const config = new Config();
 
   const app = await getApp(config);
-  app.listen(config.port, config.interface);
+  const server = http.createServer(app);
 
-  console.log(`Listening on: ${config.interface}:${config.port}`);
+  createTerminus(server, {
+    healthChecks: {
+      "/health": async ({ state }: { state: TerminusState }) =>
+        !state.isShuttingDown && app.get("browser").isConnected(),
+    },
+    onSignal: async () => {
+      logger.info("cleaning up");
+      await app.get("browser").close();
+    },
+    onShutdown: async () => {
+      logger.info("bye!");
+    },
+    beforeShutdown: async () => {
+      logger.info("shutting down");
+    },
+    signals: ["SIGINT", "SIGTERM"],
+    logger: logger.error,
+  });
+
+  server.listen(config.port, config.interface, () => {
+    logger.info(`Listening on: ${config.interface}:${config.port}`);
+  });
 }
 
 if (require.main === module) {
-  main();
+  main()
+    .then(() => logger.info("Done"))
+    .catch((err) => logger.error(err));
 }
