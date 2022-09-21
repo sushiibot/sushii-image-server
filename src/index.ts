@@ -80,6 +80,8 @@ export async function getApp(config: Config): Promise<Express> {
     process.exit(1);
   });
 
+  logger.info("Compiled templates");
+
   if (config.browserArgs.length > 0) {
     logger.info(config.browserArgs, "Using browser args");
   }
@@ -176,10 +178,40 @@ export async function getApp(config: Config): Promise<Express> {
       const { width, height } = config.getDimensions(body);
       await page.setViewport({ width, height });
 
-      // 5 Second timeout, default is 30 seconds which is too long
-      await page.setContent(html, {
-        timeout: 5000,
+      logger.debug("setting interceptor");
+
+      await page.setRequestInterception(true);
+      page.once("request", (req) => {
+        logger.debug("intercepted request");
+
+        req.respond({
+          status: 200,
+          contentType: "text/html;charset=utf-8",
+          body: html,
+        });
+
+        logger.debug("responded to request");
+
+        // Stop interception after first request as there may be additional requests for static assets
+        // Without this, page.goto will hang and timeout
+        page.setRequestInterception(false);
       });
+
+      page.on("requestfailed", (req) => {
+        logger.error(`Request failed: ${req.url()}`);
+      });
+
+      logger.debug("navigating to root url for interception");
+
+      // This sets the current url to this server, such that any relative links
+      // later in the setContent will resolve correctly
+      // E.g. <img src="/image.png"> will resolve to http://localhost:port/image.png
+      await page.goto(`http://localhost:${config.port}`, {
+        timeout: 2000,
+        waitUntil: "load",
+      });
+
+      logger.debug("taking screenshot");
 
       const imageFormat = config.getImageFormat(body);
       const screenshotOptions: puppeteer.ScreenshotOptions = {
@@ -191,10 +223,10 @@ export async function getApp(config: Config): Promise<Express> {
         screenshotOptions.quality = config.getQuality(body);
       }
 
-      // 10s screenshot timeout
+      // 2s screenshot timeout
       const screenshot = await timeout(
         page.screenshot(screenshotOptions),
-        10000,
+        2000,
         "screenshot timed out"
       );
 
@@ -228,7 +260,8 @@ export async function getApp(config: Config): Promise<Express> {
     let { context } = req.body;
 
     if (!templateName && !templateHtml) {
-      throw Error("Missing templateName or templateHtml");
+      res.status(400).send("Request missing templateName or templateHtml");
+      return;
     }
 
     let template;
@@ -238,7 +271,8 @@ export async function getApp(config: Config): Promise<Express> {
       template = templates.get(templateName);
 
       if (!template) {
-        throw Error(`No template named ${templateName} found`);
+        res.status(404).send(`No template named ${templateName} found`);
+        return;
       }
     }
 
@@ -266,7 +300,7 @@ export async function getApp(config: Config): Promise<Express> {
         endpoint: req.path,
       });
     })
-    .use(express.static("./static"));
+    .use("/static", express.static("./static"));
 
   return app;
 }
