@@ -2,9 +2,9 @@
 
 [![CI](https://github.com/sushiibot/sushii-image-server/workflows/CI/badge.svg)](https://github.com/sushiibot/sushii-image-server/actions?query=workflow%3ACI)
 
-Simple local web server made with [Koa](https://github.com/koajs/koa) and
+Simple local web server made with [Express](https://github.com/expressjs/express) and
 [puppeteer](https://github.com/GoogleChrome/puppeteer) to generate images for
-[sushii-bot](https://github.com/drklee3/sushii-bot). The `static` directory can
+[sushii-bot](https://github.com/sushiibot/sushii-ts-services). The `static` directory can
 be used to serve static files used for HTML screenshots (e.g., JavaScript, css,
 image files).
 
@@ -206,7 +206,7 @@ SUSHII_IMG_QUALITY=70
 [PM2]: https://github.com/Unitech/pm2
 [hyejoo bot]: https://top.gg/bot/733035786664149104
 [prom-client]: https://github.com/siimon/prom-client
-[sushii bot]: https://github.com/sushiibot/sushii-2
+[sushii bot]: https://github.com/sushiibot/sushii-ts-services
 [haseul bot]: https://github.com/twoscott/haseul-bot
 [miso bot]: https://github.com/joinemm/miso-bot
 [bento bot]: https://github.com/thebentobot/bentoTS

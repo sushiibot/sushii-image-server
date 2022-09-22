@@ -197,10 +197,6 @@ export async function getApp(config: Config): Promise<Express> {
         page.setRequestInterception(false);
       });
 
-      page.on("requestfailed", (req) => {
-        logger.error(`Request failed: ${req.url()}`);
-      });
-
       logger.debug("navigating to root url for interception");
 
       // This sets the current url to this server, such that any relative links
