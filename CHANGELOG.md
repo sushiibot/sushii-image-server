@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [unreleased]
 
+## [5.3.0] - 2022-09-21
+
+### Added
+
+- Logging with `pino`
+
+### Changed
+
+- Changed Koa to Express
+- Support relative and absolute links in templates and HTML to reference static files.
+  For example, `<img src="/static/image.png">` will now correctly resolve to
+  image.png in the static directory
+- Browser is closed before shutdown
+
 ## [5.2.3] - 2021-06-16
 
 ### Fixed
@@ -63,7 +77,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 -  Switch to Yarn from npm
 -  Use environment variables for configuration instead of json config file
 
-[unreleased]: https://github.com/sushiibot/sushii-image-server/compare/v5.2.0...HEAD
+[unreleased]: https://github.com/sushiibot/sushii-image-server/compare/v5.3.0...HEAD
+[5.3.0]: https://github.com/sushiibot/sushii-image-server/compare/v5.2.3...v5.3.0
 [5.2.3]: https://github.com/sushiibot/sushii-image-server/compare/v5.1.2...v5.2.3
 [5.2.2]: https://github.com/sushiibot/sushii-image-server/compare/v5.1.1...v5.2.2
 [5.2.1]: https://github.com/sushiibot/sushii-image-server/compare/v5.2.0...v5.2.1
