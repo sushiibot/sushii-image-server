@@ -203,7 +203,7 @@ export async function getApp(config: Config): Promise<Express> {
       // later in the setContent will resolve correctly
       // E.g. <img src="/image.png"> will resolve to http://localhost:port/image.png
       await page.goto(`http://localhost:${config.port}`, {
-        timeout: 2000,
+        timeout: 10000,
         waitUntil: "load",
       });
 
@@ -219,10 +219,10 @@ export async function getApp(config: Config): Promise<Express> {
         screenshotOptions.quality = config.getQuality(body);
       }
 
-      // 2s screenshot timeout
+      // 10s screenshot timeout
       const screenshot = await timeout(
         page.screenshot(screenshotOptions),
-        2000,
+        10000,
         "screenshot timed out"
       );
 
