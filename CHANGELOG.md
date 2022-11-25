@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [unreleased]
 
+## [5.3.1] - 2022-11-24
+
+### Changed
+
+- Increase puppeteer timeouts for goto and screenshot ([@twoscott])
+
 ## [5.3.0] - 2022-09-21
 
 ### Added
@@ -87,3 +93,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [5.0.0]: https://github.com/sushiibot/sushii-image-server/compare/v4.0.0...v5.0.0
 
 [@joinemm]: https://github.com/joinemm
+[@twoscott]: https://github.com/twoscott
